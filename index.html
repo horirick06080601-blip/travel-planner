@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夏旅プランナー 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --accent: #f97316;
+    --green: #10b981;
+    --bg: #fafafa;
+    --card: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --shadow: 0 8px 32px rgba(99,102,241,0.10);
+    --radius: 20px;
+  }
+  body { font-family: 'Hiragino Sans','Meiryo',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(150deg, #6366f1 0%, #a855f7 50%, #f97316 100%);
+    color: #fff; text-align: center; padding: 72px 24px 100px; position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 60px;
+    background: var(--bg); clip-path: ellipse(55% 100% at 50% 100%);
+  }
+  .hero-emoji { font-size: 64px; display: block; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .hero h1 { font-size: clamp(26px,5vw,46px); font-weight: 900; margin-bottom: 14px; letter-spacing: -0.5px; }
+  .hero p { font-size: 17px; opacity: 0.92; max-width: 520px; margin: 0 auto 36px; line-height: 1.7; }
+  .hero-btn {
+    display: inline-block; background: #fff; color: var(--primary-dark);
+    font-weight: 800; font-size: 18px; padding: 18px 48px;
+    border-radius: 50px; cursor: pointer; border: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18); transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(0,0,0,0.22); }
+
+  /* WIZARD */
+  .wizard { max-width: 760px; margin: -50px auto 80px; padding: 0 16px; }
+
+  /* Progress */
+  .progress-wrap { display: flex; align-items: center; justify-content: center; margin-bottom: 36px; gap: 0; }
+  .prog-step { display: flex; flex-direction: column; align-items: center; }
+  .prog-dot {
+    width: 44px; height: 44px; border-radius: 50%; background: #fff;
+    border: 3px solid var(--border); display: flex; align-items: center; justify-content: center;
+    font-size: 18px; transition: all 0.35s; z-index: 1;
+  }
+  .prog-step.active .prog-dot { border-color: var(--primary); background: var(--primary); }
+  .prog-step.done .prog-dot { border-color: var(--green); background: var(--green); }
+  .prog-step.done .prog-dot::after { content: '✓'; color: #fff; font-weight: 800; font-size: 16px; }
+  .prog-step.active .prog-dot .prog-num,
+  .prog-step.done .prog-dot .prog-num { display: none; }
+  .prog-step.active .prog-dot::after { content: attr(data-icon); font-size: 20px; }
+  .prog-label { font-size: 11px; color: var(--muted); margin-top: 6px; white-space: nowrap; font-weight: 600; }
+  .prog-step.active .prog-label { color: var(--primary); }
+  .prog-line { flex: 1; height: 3px; background: var(--border); margin: 0 4px 20px; max-width: 60px; transition: background 0.35s; }
+  .prog-line.done { background: var(--green); }
+
+  /* Step Card */
+  .step-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 44px 40px; display: none; }
+  .step-card.active { display: block; animation: slideUp 0.35s ease; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .step-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; }
+  .step-title { font-size: 24px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+  .step-sub { color: var(--muted); font-size: 14px; margin-bottom: 32px; line-height: 1.6; }
+
+  /* Option Cards */
+  .opt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-bottom: 32px; }
+  .opt-card {
+    border: 2.5px solid var(--border); border-radius: 16px; padding: 20px 14px;
+    text-align: center; cursor: pointer; transition: all 0.2s; background: #fff; position: relative;
+  }
+  .opt-card:hover { border-color: var(--primary); background: #f5f3ff; transform: translateY(-2px); }
+  .opt-card.selected { border-color: var(--primary); background: #eef2ff; }
+  .opt-card .ico { font-size: 36px; display: block; margin-bottom: 10px; }
+  .opt-card .lbl { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .opt-card .sub { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .opt-card.selected::after {
+    content: '✓'; position: absolute; top: 8px; right: 10px;
+    color: var(--primary); font-weight: 900; font-size: 14px;
+  }
+
+  /* Q Cards (personality) */
+  .q-section { margin-bottom: 32px; }
+  .q-label { font-size: 16px; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .q-num { width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .q-opts { display: flex; flex-direction: column; gap: 10px; }
+  .q-opt {
+    display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+    border: 2.5px solid var(--border); border-radius: 14px; cursor: pointer;
+    transition: all 0.2s; background: #fff;
+  }
+  .q-opt:hover { border-color: var(--primary); background: #f5f3ff; }
+  .q-opt.selected { border-color: var(--primary); background: #eef2ff; }
+  .q-opt .q-ico { font-size: 26px; flex-shrink: 0; }
+  .q-opt .q-text { font-size: 14px; font-weight: 600; }
+  .q-opt .q-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Budget */
+  .budget-hero { text-align: center; padding: 24px 0 20px; }
+  .budget-num { font-size: 40px; font-weight: 900; color: var(--primary); letter-spacing: -1px; }
+  .budget-unit { display: none; }
+  .budget-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  input[type=range] { width: 100%; accent-color: var(--primary); height: 6px; border-radius: 6px; cursor: pointer; margin-bottom: 8px; }
+  .range-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  .preset-chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .preset-chip {
+    padding: 9px 20px; border-radius: 50px; border: 2px solid var(--border);
+    font-size: 13px; font-weight: 700; cursor: pointer; background: #fff; transition: all 0.2s;
+  }
+  .preset-chip:hover { border-color: var(--primary); color: var(--primary); }
+  .preset-chip.selected { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+  /* Nav */
+  .step-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }
+  .btn { padding: 15px 36px; border-radius: 50px; font-size: 15px; font-weight: 800; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-ghost { background: transparent; border: 2px solid var(--border); color: var(--muted); }
+  .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 6px 20px rgba(99,102,241,0.35); }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+  .btn-primary:disabled { background: var(--border); color: var(--muted); box-shadow: none; transform: none; cursor: not-allowed; }
+  .btn-search { background: linear-gradient(135deg, var(--primary), #a855f7); color: #fff; box-shadow: 0 6px 20px rgba(99,102,241,0.4); font-size: 16px; }
+  .btn-search:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(99,102,241,0.45); }
+  .btn-search:disabled { background: var(--border); color: var(--muted); box-shadow: none; transform: none; cursor: not-allowed; }
+
+  /* RESULTS */
+  #results { display: none; max-width: 1100px; margin: 0 auto 80px; padding: 0 16px; }
+
+  .persona-banner {
+    background: linear-gradient(135deg, var(--primary), #a855f7);
+    color: #fff; border-radius: var(--radius); padding: 32px 36px;
+    margin-bottom: 40px; display: flex; align-items: center; gap: 24px;
+    box-shadow: 0 8px 32px rgba(99,102,241,0.25);
+  }
+  .persona-emoji { font-size: 56px; flex-shrink: 0; }
+  .persona-type { font-size: 12px; font-weight: 700; letter-spacing: 2px; opacity: 0.85; margin-bottom: 6px; text-transform: uppercase; }
+  .persona-name { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+  .persona-desc { font-size: 14px; opacity: 0.9; line-height: 1.6; }
+
+  .results-sub { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 28px; }
+
+  .filter-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 32px; }
+  .fil-tab { padding: 9px 22px; border-radius: 50px; border: 2px solid var(--border); font-size: 13px; font-weight: 700; cursor: pointer; background: #fff; transition: all 0.2s; }
+  .fil-tab:hover { border-color: var(--primary); color: var(--primary); }
+  .fil-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+  .dest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+
+  .dest-card { background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border: 2px solid transparent; }
+  .dest-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(99,102,241,0.18); }
+  .dest-card.top-pick { border-color: var(--primary); }
+
+  .dest-img { height: 172px; display: flex; align-items: center; justify-content: center; font-size: 70px; position: relative; }
+  .dest-rank { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.45); color: #fff; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 50px; backdrop-filter: blur(6px); }
+  .dest-badge { position: absolute; top: 12px; right: 12px; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 50px; }
+  .badge-match { background: var(--primary); color: #fff; }
+  .badge-cheap { background: var(--green); color: #fff; }
+  .badge-luxury { background: #7c3aed; color: #fff; }
+
+  .dest-body { padding: 22px; }
+  .dest-name { font-size: 20px; font-weight: 900; margin-bottom: 3px; }
+  .dest-region { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .dest-reason { font-size: 13px; color: var(--primary); font-weight: 700; background: #eef2ff; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; line-height: 1.5; }
+  .dest-desc { font-size: 13px; color: #4b5563; line-height: 1.6; margin-bottom: 14px; }
+  .dest-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .chip { background: #f3f4f6; border-radius: 50px; padding: 4px 12px; font-size: 12px; color: #4b5563; }
+  .dest-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border); }
+  .dest-budget-label { font-size: 12px; color: var(--muted); }
+  .dest-budget-val { font-size: 19px; font-weight: 900; color: var(--primary); }
+  .detail-btn { width: 100%; margin-top: 14px; padding: 13px; border-radius: 12px; background: var(--primary); color: #fff; font-weight: 800; font-size: 14px; border: none; cursor: pointer; transition: background 0.2s; }
+  .detail-btn:hover { background: var(--primary-dark); }
+
+  /* MODAL */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+  .overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: 24px; max-width: 640px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 32px 80px rgba(0,0,0,0.25); animation: slideUp 0.3s ease; }
+  .modal-img { height: 200px; display: flex; align-items: center; justify-content: center; font-size: 88px; border-radius: 24px 24px 0 0; position: relative; }
+  .modal-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.85); border: none; border-radius: 50%; width: 38px; height: 38px; font-size: 18px; cursor: pointer; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+  .modal-body { padding: 30px 32px; }
+  .modal-title { font-size: 26px; font-weight: 900; margin-bottom: 4px; }
+  .modal-region { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .modal-reason { font-size: 14px; color: var(--primary); font-weight: 700; background: #eef2ff; border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; line-height: 1.6; }
+  .modal-sec { font-size: 15px; font-weight: 800; margin: 22px 0 12px; color: var(--primary-dark); display: flex; align-items: center; gap: 6px; }
+  .itin { list-style: none; }
+  .itin li { display: flex; gap: 14px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .itin li:last-child { border: none; margin-bottom: 0; }
+  .itin-day { min-width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--primary), #a855f7); color: #fff; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-direction: column; line-height: 1.3; flex-shrink: 0; }
+  .itin-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .itin-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .cost-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .cost-tbl td { padding: 9px 4px; border-bottom: 1px solid var(--border); }
+  .cost-tbl td:last-child { text-align: right; font-weight: 700; }
+  .cost-tbl tr:last-child td { border: none; font-weight: 900; font-size: 16px; color: var(--primary); }
+  .tips-ul { list-style: none; }
+  .tips-ul li { font-size: 13px; color: #4b5563; padding: 7px 0 7px 22px; position: relative; line-height: 1.55; border-bottom: 1px solid #f3f4f6; }
+  .tips-ul li:last-child { border: none; }
+  .tips-ul li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 900; }
+
+  .reset-btn { display: block; margin: 40px auto; padding: 13px 30px; border-radius: 50px; border: 2px solid var(--border); background: #fff; color: var(--muted); font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .reset-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+  .no-res { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .no-res .ico { font-size: 48px; margin-bottom: 16px; }
+
+  @media (max-width: 600px) {
+    .step-card { padding: 28px 18px; }
+    .opt-grid { grid-template-columns: repeat(2, 1fr); }
+    .dest-grid { grid-template-columns: 1fr; }
+    .persona-banner { flex-direction: column; text-align: center; }
+    .modal-body { padding: 22px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-emoji">✈️</span>
+  <h1>あなただけの夏旅を見つけよう</h1>
+  <p>予算より先に、あなた自身のことを教えてください。<br>何に幸せを感じる人なのかを知ることで、本当に満足できる旅行が見えてきます。</p>
+  <button class="hero-btn" onclick="startWizard()">旅行の計画を始める →</button>
+</div>
+
+<!-- WIZARD -->
+<div class="wizard" id="wizard">
+
+  <!-- Progress -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="prog-step active" id="ps1"><div class="prog-dot" data-icon="👥"><span class="prog-num">1</span></div><div class="prog-label">あなたは？</div></div>
+    <div class="prog-line" id="pl1"></div>
+    <div class="prog-step" id="ps2"><div class="prog-dot" data-icon="💭"><span class="prog-num">2</span></div><div class="prog-label">好きなこと</div></div>
+    <div class="prog-line" id="pl2"></div>
+    <div class="prog-step" id="ps3"><div class="prog-dot" data-icon="🌟"><span class="prog-num">3</span></div><div class="prog-label">旅のビジョン</div></div>
+    <div class="prog-line" id="pl3"></div>
+    <div class="prog-step" id="ps4"><div class="prog-dot" data-icon="📋"><span class="prog-num">4</span></div><div class="prog-label">条件</div></div>
+  </div>
+
+  <!-- STEP 1: Who -->
+  <div class="step-card active" id="step1">
+    <div class="step-eyebrow">Step 1 of 4</div>
+    <div class="step-title">誰と旅行しますか？ 👥</div>
+    <div class="step-sub">旅の楽しみ方は、誰と行くかで大きく変わります。まず、あなたの旅の相手を教えてください。</div>
+    <div class="opt-grid">
+      <div class="opt-card" onclick="pick1(this,'solo')"><span class="ico">🧳</span><div class="lbl">一人旅</div><div class="sub">自分のペースで、自由に</div></div>
+      <div class="opt-card" onclick="pick1(this,'couple')"><span class="ico">💑</span><div class="lbl">パートナーと</div><div class="sub">二人でロマンチックに</div></div>
+      <div class="opt-card" onclick="pick1(this,'family_kids')"><span class="ico">👨‍👩‍👧‍👦</span><div class="lbl">家族（子あり）</div><div class="sub">子どもも一緒に楽しく</div></div>
+      <div class="opt-card" onclick="pick1(this,'family_adult')"><span class="ico">👨‍👩‍👴‍👵</span><div class="lbl">家族（大人のみ）</div><div class="sub">親・兄弟・親戚と</div></div>
+      <div class="opt-card" onclick="pick1(this,'friends')"><span class="ico">🎉</span><div class="lbl">友人たちと</div><div class="sub">みんなでワイワイ</div></div>
+    </div>
+    <div class="step-nav"><div></div><button class="btn btn-primary" id="next1" onclick="goStep(2)" disabled>次へ →</button></div>
+  </div>
+
+  <!-- STEP 2: Personality -->
+  <div class="step-card" id="step2">
+    <div class="step-eyebrow">Step 2 of 4</div>
+    <div class="step-title">あなたのことを教えてください 💭</div>
+    <div class="step-sub">旅行とは少し離れた質問をします。あなたが普段どんなことに幸せを感じるかを知りたいです。</div>
+
+    <div class="q-section">
+      <div class="q-label"><span class="q-num">1</span>急に休みができた！あなたはどう過ごしますか？</div>
+      <div class="q-opts" id="q1">
+        <div class="q-opt" data-val="relax"><span class="q-ico">🛋️</span><div><div class="q-text">家でゆっくり、好きなものを食べながら映画や本を楽しむ</div><div class="q-sub">のんびり・ゆったりが幸せ</div></div></div>
+        <div class="q-opt" data-val="social"><span class="q-ico">🍽️</span><div><div class="q-text">友人を誘って美味しいお店に行く、または街をぶらぶら</div><div class="q-sub">誰かと一緒に過ごすのが好き</div></div></div>
+        <div class="q-opt" data-val="outdoor"><span class="q-ico">🌿</span><div><div class="q-text">自然の中へ。ハイキングやキャンプ、公園で深呼吸</div><div class="q-sub">体を動かす・外に出るのが好き</div></div></div>
+        <div class="q-opt" data-val="explore"><span class="q-ico">🗺️</span><div><div class="q-text">気になっていた場所や展覧会に一人で足を運ぶ</div><div class="q-sub">新しいものを発見するのが好き</div></div></div>
+      </div>
+    </div>
+
+    <div class="q-section">
+      <div class="q-label"><span class="q-num">2</span>心が一番豊かになるのはどんな瞬間ですか？</div>
+      <div class="q-opts" id="q2">
+        <div class="q-opt" data-val="beauty"><span class="q-ico">🌅</span><div><div class="q-text">息をのむような絶景や、自然の美しさに触れたとき</div><div class="q-sub">視覚的な感動が好き</div></div></div>
+        <div class="q-opt" data-val="taste"><span class="q-ico">🍜</span><div><div class="q-text">初めて食べる美味しいものに出会ったとき</div><div class="q-sub">食べることが生きがい</div></div></div>
+        <div class="q-opt" data-val="achieve"><span class="q-ico">🏆</span><div><div class="q-text">目標を達成したとき・やり遂げた達成感</div><div class="q-sub">チャレンジと成長が好き</div></div></div>
+        <div class="q-opt" data-val="connect"><span class="q-ico">🤝</span><div><div class="q-text">大切な人と、何気ない時間をゆっくり過ごしているとき</div><div class="q-sub">つながりと安らぎが大切</div></div></div>
+        <div class="q-opt" data-val="learn"><span class="q-ico">💡</span><div><div class="q-text">知らなかったことを知り、視野が広がったとき</div><div class="q-sub">知的な刺激が好き</div></div></div>
+      </div>
+    </div>
+
+    <div class="q-section">
+      <div class="q-label"><span class="q-num">3</span>旅行が終わった後、何を一番語りたいですか？</div>
+      <div class="q-opts" id="q3">
+        <div class="q-opt" data-val="food_memory"><span class="q-ico">😋</span><div><div class="q-text">「あそこのご飯、本当に美味しかった！」食の体験</div></div></div>
+        <div class="q-opt" data-val="view_memory"><span class="q-ico">📸</span><div><div class="q-text">「この景色、見たことない！」写真とともに語る絶景</div></div></div>
+        <div class="q-opt" data-val="activity_memory"><span class="q-ico">🎿</span><div><div class="q-text">「あんな体験、普段絶対できない！」アクティビティの興奮</div></div></div>
+        <div class="q-opt" data-val="relax_memory"><span class="q-ico">😌</span><div><div class="q-text">「本当に癒された〜」心と体のリフレッシュ感</div></div></div>
+        <div class="q-opt" data-val="culture_memory"><span class="q-ico">🏛️</span><div><div class="q-text">「歴史や文化に触れて、ものの見方が変わった」</div></div></div>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="goStep(1)">← 戻る</button>
+      <button class="btn btn-primary" id="next2" onclick="goStep(3)" disabled>次へ →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Vision -->
+  <div class="step-card" id="step3">
+    <div class="step-eyebrow">Step 3 of 4</div>
+    <div class="step-title">理想の旅のイメージは？ 🌟</div>
+    <div class="step-sub">目を閉じて想像してみてください。最高の夏旅行のシーンはどれですか？（複数選択OK）</div>
+
+    <div class="opt-grid" style="grid-template-columns: repeat(auto-fill, minmax(140px,1fr))">
+      <div class="opt-card" onclick="toggleVision(this,'beach_resort')"><span class="ico">🏖️</span><div class="lbl">青い海で泳ぐ</div><div class="sub">ビーチ・シュノーケリング</div></div>
+      <div class="opt-card" onclick="toggleVision(this,'mountain_forest')"><span class="ico">🏔️</span><div class="lbl">大自然の中に</div><div class="sub">山・森・絶景</div></div>
+      <div class="opt-card" onclick="toggleVision(this,'luxury_hotel')"><span class="ico">🏨</span><div class="lbl">高級ホテルで優雅に</div><div class="sub">プール・スパ・ルームサービス</div></div>
+      <div class="opt-card" onclick="toggleVision(this,'street_food')"><span class="ico">🌮</span><div class="lbl">現地の食を楽しむ</div><div class="sub">市場・屋台・ご当地グルメ</div></div>
+      <div class="opt-card" onclick="toggleVision(this,'historic_town')"><span class="ico">🏯</span><div class="lbl">歴史ある街を歩く</div><div class="sub">世界遺産・古都・博物館</div></div>
+      <div class="opt-card" onclick="toggleVision(this,'adventure_sport')"><span class="ico">🤿</span><div class="lbl">スリルを楽しむ</div><div class="sub">ダイビング・トレッキング</div></div>
+      <div class="opt-card" onclick="toggleVision(this,'city_walk')"><span class="ico">🏙️</span><div class="lbl">都市を散策する</div><div class="sub">カフェ・ショッピング・夜景</div></div>
+      <div class="opt-card" onclick="toggleVision(this,'onsen_slow')"><span class="ico">♨️</span><div class="lbl">温泉・スパでのんびり</div><div class="sub">疲れを癒す・何もしない贅沢</div></div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="goStep(2)">← 戻る</button>
+      <button class="btn btn-primary" id="next3" onclick="goStep(4)" disabled>次へ →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Conditions -->
+  <div class="step-card" id="step4">
+    <div class="step-eyebrow">Step 4 of 4</div>
+    <div class="step-title">最後に実際の条件を 📋</div>
+    <div class="step-sub">あなたらしさはもう十分わかりました。あとは現実的な制約だけ教えてください。</div>
+
+    <div style="margin-bottom:30px">
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px">💰 予算の目安（1人あたり・交通〜食事込み）</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px">おおまかな目安でOKです。あとで変えることもできます。</div>
+      <div class="budget-hero">
+        <span class="budget-num" id="bdgNum">10</span><span class="budget-unit">万円</span>
+        <div class="budget-sub" id="bdgSub">アジア旅行や国内リゾートに最適な予算です</div>
+      </div>
+      <input type="range" id="bdgSlider" min="0" max="10" value="4" oninput="updateBdg(this.value)">
+      <div class="range-labels"><span>🌿 0円</span><span>👑 青天井</span></div>
+      <div class="preset-chips">
+        <div class="preset-chip" style="border-color:#10b981;color:#10b981" onclick="setBdgPreset(0)">🌿 0円</div>
+        <div class="preset-chip" onclick="setBdgPreset(2)">〜3万円</div>
+        <div class="preset-chip" onclick="setBdgPreset(4)">〜10万円</div>
+        <div class="preset-chip selected" onclick="setBdgPreset(6)">〜30万円</div>
+        <div class="preset-chip" onclick="setBdgPreset(8)">〜100万円</div>
+        <div class="preset-chip" style="border-color:#f59e0b;color:#f59e0b" onclick="setBdgPreset(10)">👑 青天井</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:28px">
+      <div style="font-size:15px;font-weight:800;margin-bottom:14px">📅 旅行の日数</div>
+      <div class="opt-grid" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))">
+        <div class="opt-card" onclick="pickDur(this,'2days')"><span class="ico">🌅</span><div class="lbl">1泊2日</div></div>
+        <div class="opt-card" onclick="pickDur(this,'3days')"><span class="ico">☀️</span><div class="lbl">2泊3日</div></div>
+        <div class="opt-card" onclick="pickDur(this,'5days')"><span class="ico">🌤️</span><div class="lbl">4〜5日</div></div>
+        <div class="opt-card" onclick="pickDur(this,'week')"><span class="ico">🗓️</span><div class="lbl">1週間</div></div>
+        <div class="opt-card" onclick="pickDur(this,'long')"><span class="ico">🌍</span><div class="lbl">2週間+</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:15px;font-weight:800;margin-bottom:14px">🌐 エリアの希望</div>
+      <div class="opt-grid" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">
+        <div class="opt-card" onclick="pickArea(this,'domestic')"><span class="ico">🗾</span><div class="lbl">国内だけ</div></div>
+        <div class="opt-card" onclick="pickArea(this,'asia')"><span class="ico">🌏</span><div class="lbl">アジア</div></div>
+        <div class="opt-card" onclick="pickArea(this,'hawaii')"><span class="ico">🌺</span><div class="lbl">ハワイ・グアム</div></div>
+        <div class="opt-card" onclick="pickArea(this,'europe')"><span class="ico">🏰</span><div class="lbl">ヨーロッパ</div></div>
+        <div class="opt-card" onclick="pickArea(this,'any')"><span class="ico">🌐</span><div class="lbl">どこでも</div></div>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="goStep(3)">← 戻る</button>
+      <button class="btn btn-search" id="searchBtn" onclick="showResults()" disabled>✨ 旅行先を見つける</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div class="persona-banner" id="personaBanner"></div>
+  <p class="results-sub" id="resultsSub"></p>
+
+  <div class="filter-row">
+    <div class="fil-tab active" onclick="filterR('all',this)">すべて</div>
+    <div class="fil-tab" onclick="filterR('domestic',this)">国内</div>
+    <div class="fil-tab" onclick="filterR('overseas',this)">海外</div>
+    <div class="fil-tab" onclick="filterR('budget_ok',this)">予算内</div>
+    <div class="fil-tab" onclick="filterR('top',this)">特におすすめ</div>
+  </div>
+
+  <div class="dest-grid" id="destGrid"></div>
+  <div class="no-res" id="noRes" style="display:none"><div class="ico">🔍</div><p>条件に合う旅行先が見つかりませんでした。フィルターを変えてみてください。</p></div>
+
+  <button class="reset-btn" onclick="resetAll()">← 最初からやり直す</button>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+  <div class="modal">
+    <div class="modal-img" id="mImg"><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body" id="mBody"></div>
+  </div>
+</div>
+
+<script>
+// ======== STATE ========
+const S = {
+  companion: '',
+  q1: new Set(), q2: new Set(), q3: new Set(),
+  visions: new Set(),
+  budgetIdx: 4,
+  duration: '',
+  area: ''
+};
+
+// ======== BUDGET DATA ========
+const BUDGETS = [
+  { label:'3', sub:'日帰りや近場の1泊旅行に', val:30000 },
+  { label:'5', sub:'格安LCCで国内旅行や近隣アジアへ', val:50000 },
+  { label:'7', sub:'国内旅行・近隣アジアの格安プランに', val:70000 },
+  { label:'10', sub:'アジア旅行や国内リゾートに最適な予算です', val:100000 },
+  { label:'15', sub:'ハワイ・バリ島など人気リゾートへ', val:150000 },
+  { label:'20', sub:'充実した海外旅行が楽しめます', val:200000 },
+  { label:'30', sub:'ヨーロッパや贅沢な旅が可能に', val:300000 },
+  { label:'40', sub:'プレミアムな旅行体験ができます', val:400000 },
+  { label:'50', sub:'高級リゾートへも十分届く予算', val:500000 },
+  { label:'50+', sub:'モルディブや超高級ホテルも選択肢に', val:700000 }
+];
+
+// ======== PERSONAS ========
+function buildPersona() {
+  // Use primary (first) selected value from each set for persona
+  const q1=S.q1.values().next().value, q2=S.q2.values().next().value, q3=S.q3.values().next().value, comp=S.companion;
+
+  // Type mapping
+  const combos = {
+    'beauty+view_memory': { emoji:'🌄', name:'絶景ハンター', desc:'美しい景色に心を動かされる人。写真や記憶に残る「見たことがない景色」を求めて旅する。' },
+    'taste+food_memory': { emoji:'🍜', name:'グルメ旅人', desc:'旅の目的は「食」。現地でしか食べられないものに出会うことが、最大の幸せ。' },
+    'achieve+activity_memory': { emoji:'🏄', name:'アドベンチャー派', desc:'日常では味わえないスリルと達成感を求める。体を動かし、限界を超えることが喜び。' },
+    'connect+relax_memory': { emoji:'😌', name:'癒し・ゆったり派', desc:'大切な人とゆっくり過ごすこと、非日常の空間でリフレッシュすることが旅の目的。' },
+    'learn+culture_memory': { emoji:'🏛️', name:'文化・知的探求者', desc:'知らない歴史や文化に触れて視野を広げること。旅は自分を豊かにする学びの場。' },
+  };
+
+  for (const [key, val] of Object.entries(combos)) {
+    const [k1, k2] = key.split('+');
+    if (q2 === k1 && q3 === k2) return val;
+  }
+
+  // Fallback
+  const q2map = {
+    beauty: { emoji:'🌅', name:'美景探求者', desc:'美しいものに感動できる感受性の高い旅人。景色と写真が旅の記憶を彩ります。' },
+    taste:  { emoji:'🍽️', name:'グルメ旅人', desc:'食べることへの情熱が旅を動かす。食の記憶は永遠に残ります。' },
+    achieve:{ emoji:'🏆', name:'アクティブ派', desc:'じっとしていられない行動派。旅でも挑戦と達成感を求めます。' },
+    connect:{ emoji:'💛', name:'絆を大切にする人', desc:'一緒にいる人との時間こそが旅の宝もの。場所よりも、誰と過ごすかを重視します。' },
+    learn:  { emoji:'📚', name:'知的好奇心旺盛', desc:'未知への好奇心が旅を豊かにします。歴史・文化・人との出会いから学ぶことが好き。' },
+  };
+
+  return q2map[q2] || { emoji:'✈️', name:'自由な旅人', desc:'自分だけのスタイルで旅を楽しむ人。条件から最高のプランを提案します。' };
+}
+
+// ======== DESTINATIONS ========
+const DESTS = [
+  {
+    id:'okinawa', name:'沖縄', nameEn:'Okinawa, Japan',
+    emoji:'🏝️', bg:'linear-gradient(135deg,#06b6d4,#0ea5e9)',
+    region:'国内 / 沖縄県', domestic:true,
+    minBudget:60000, maxBudget:200000,
+    tags:{styles:['beach_resort','adventure_sport'], q2:['beauty','taste','achieve'], q3:['view_memory','food_memory','activity_memory'], companion:['solo','couple','family_kids','friends']},
+    duration:['2days','3days','5days'], area:['domestic','any'],
+    matchReasons:{
+      beauty:'エメラルドグリーンの海は、写真では伝わりきらない美しさ。絶景好きのあなたに。',
+      taste:'ソーキそば・海ぶどう・泡盛・島の市場グルメ。食の宝庫です。',
+      achieve:'シュノーケリング・ダイビング・カヤック。アクティブな体験が豊富。',
+      connect:'ゆっくりとした島時間が、大切な人との会話を引き出してくれます。',
+      default:'日本最大のリゾート地。夏の沖縄は何度でも行きたくなる魅力があります。',
+    },
+    desc:'エメラルドグリーンの海と白砂のビーチ、琉球文化が共存する島。水中も陸も、驚きに満ちています。',
+    chips:['✈️ 約2〜3h','🌊 シュノーケリング','🐠 ダイビング','🏯 首里城','🍜 ソーキそば'],
+    itinerary:[
+      {day:'Day1',title:'那覇到着・国際通りと牧志公設市場',desc:'ゆいレールで移動。首里城・牧志公設市場を観光。夜は国際通りで沖縄料理を堪能'},
+      {day:'Day2',title:'北部・美ら海水族館・古宇利島',desc:'古宇利島の青い海→美ら海水族館→美しい青の洞窟でシュノーケリング'},
+      {day:'Day3',title:'ビーチでゆっくり・帰路',desc:'砂辺ビーチや波の上ビーチでのんびり。夕方フライトで帰路へ'},
+    ],
+    costs:[['往復航空券','¥25,000〜50,000'],['宿泊（2泊）','¥20,000〜60,000'],['食費（3日分）','¥9,000〜15,000'],['観光・交通','¥8,000〜15,000']],
+    total:'¥62,000〜140,000',
+    tips:['LCC（ジェットスター・ピーチ）で航空券を節約','北部は車必須。レンタカーを事前予約','7月〜8月は混雑ピーク。6月末・9月がねらい目','ゲストハウスなら1泊3,000円〜'],
+  },
+  {
+    id:'hokkaido', name:'北海道', nameEn:'Hokkaido, Japan',
+    emoji:'🌿', bg:'linear-gradient(135deg,#10b981,#059669)',
+    region:'国内 / 北海道', domestic:true,
+    minBudget:60000, maxBudget:200000,
+    tags:{styles:['mountain_forest','street_food'], q2:['beauty','taste','learn'], q3:['food_memory','view_memory','relax_memory'], companion:['solo','couple','family_adult','friends']},
+    duration:['3days','5days','week'], area:['domestic','any'],
+    matchReasons:{
+      beauty:'大雪山の雄大さ、富良野のラベンダー畑、知床の原生自然。スケールの大きな絶景が待っています。',
+      taste:'海鮮・スープカレー・ラーメン・ジンギスカン・チーズ。日本屈指のグルメ天国。',
+      connect:'広大な自然の中で、隣にいる大切な人との会話が深まります。',
+      default:'夏の北海道は涼しく快適。大自然と絶品グルメの組み合わせが最高です。',
+    },
+    desc:'夏でも涼しく快適な北の大地。富良野のラベンダー、知床の大自然、函館の夜景、新鮮な海鮮グルメ。',
+    chips:['✈️ 約1.5h','🌸 ラベンダー','🦀 海鮮','🗻 大雪山','🍜 スープカレー'],
+    itinerary:[
+      {day:'Day1',title:'札幌到着・大通公園・すすきの',desc:'北海道ラーメン・スープカレー・ジンギスカン。夜のすすきのも魅力的'},
+      {day:'Day2',title:'富良野・美瑛ドライブ',desc:'青い池・白金温泉・ラベンダー畑。全て揃った大人気ルート'},
+      {day:'Day3',title:'小樽・海鮮三昧',desc:'小樽運河・寿司通りで海鮮三昧。ガラス工芸のお土産も'},
+      {day:'Day4',title:'函館・帰路',desc:'朝市の海鮮丼、五稜郭、函館山の夜景で締めくくり'},
+    ],
+    costs:[['往復航空券','¥20,000〜45,000'],['宿泊（3泊）','¥24,000〜70,000'],['レンタカー（3日）','¥15,000〜25,000'],['食費・観光','¥15,000〜25,000']],
+    total:'¥74,000〜165,000',
+    tips:['6〜7月はラベンダーが見頃','JR北海道フリーパスで交通費を節約','じゃらん早期予約割引を活用','ふるさと納税でグルメを事前にゲット'],
+  },
+  {
+    id:'kyoto', name:'京都・大阪', nameEn:'Kyoto & Osaka, Japan',
+    emoji:'⛩️', bg:'linear-gradient(135deg,#f59e0b,#ef4444)',
+    region:'国内 / 関西', domestic:true,
+    minBudget:35000, maxBudget:150000,
+    tags:{styles:['historic_town','street_food','city_walk'], q2:['learn','taste','beauty'], q3:['culture_memory','food_memory','view_memory'], companion:['solo','couple','family_adult','friends']},
+    duration:['2days','3days','5days'], area:['domestic','any'],
+    matchReasons:{
+      learn:'千年以上の歴史が生きた街。歩くだけで日本の歴史と文化が学べます。',
+      taste:'大阪の食い倒れ文化。たこ焼き・串カツ・お好み焼き・京懐石まで幅広い。',
+      beauty:'祇園・嵐山・伏見稲荷の千本鳥居。写真を撮りたくなる場所だらけ。',
+      default:'日本文化の結晶と食の都。日本人なら一度は深く向き合いたい場所。',
+    },
+    desc:'千年の都・京都の歴史と、食い倒れの街・大阪のグルメを同時に体験。日本の本質に触れる旅。',
+    chips:['🚄 新幹線OK','⛩️ 伏見稲荷','🦌 奈良の鹿','🍜 大阪グルメ','🌙 祇園の夜'],
+    itinerary:[
+      {day:'Day1',title:'京都・嵐山〜金閣寺〜祇園',desc:'竹林の道、渡月橋、金閣寺を巡り夕方は先斗町・祇園で夕食'},
+      {day:'Day2',title:'伏見稲荷〜奈良',desc:'千本鳥居でSNS映え。奈良へ移動して鹿と触れ合い、東大寺を参拝'},
+      {day:'Day3',title:'大阪・道頓堀',desc:'たこ焼き・串カツ・お好み焼きを食べ歩き。夜は難波・心斎橋でショッピング'},
+    ],
+    costs:[['往復交通費','¥10,000〜30,000'],['宿泊（2泊）','¥14,000〜40,000'],['食費（3日分）','¥8,000〜15,000'],['観光・入場料','¥5,000〜10,000']],
+    total:'¥37,000〜95,000',
+    tips:['青春18きっぷで交通費を大幅節約','ゲストハウス・カプセルホテルなら1泊3,000円〜','e-bikeレンタルで京都市内をお得に観光','朝早く行くと観光地が空いている'],
+  },
+  {
+    id:'taiwan', name:'台湾', nameEn:'Taiwan',
+    emoji:'🥟', bg:'linear-gradient(135deg,#e11d48,#f97316)',
+    region:'海外 / 東アジア', domestic:false,
+    minBudget:60000, maxBudget:180000,
+    tags:{styles:['street_food','historic_town','mountain_forest','city_walk'], q2:['taste','learn','beauty'], q3:['food_memory','culture_memory','view_memory'], companion:['solo','couple','friends']},
+    duration:['3days','5days'], area:['asia','any'],
+    matchReasons:{
+      taste:'夜市グルメ・小籠包・牛肉麺・珍珠奶茶。台湾は食べることへの情熱が旅を豊かにします。',
+      learn:'日本統治時代の建物、先住民族の文化、独自の民主主義の歴史。知的好奇心を刺激。',
+      beauty:'九份の幻想的な夜景、太魯閣渓谷の絶壁、野柳の奇岩。多彩な絶景が待っています。',
+      default:'日本から近く、物価安く、親日的。初海外にも最適なコスパ最高の旅先。',
+    },
+    desc:'日本から3〜4時間で行ける隣の国。夜市グルメ、九份の夜景、温泉、太魯閣渓谷。物価安でコスパ最高。',
+    chips:['✈️ 約3〜4h','🍢 夜市','♨️ 温泉','🏔️ 太魯閣','🥟 小籠包'],
+    itinerary:[
+      {day:'Day1',title:'台北到着・士林夜市',desc:'小籠包・牛肉麺・珍珠奶茶を食べ歩き。夜市でローカルグルメ三昧'},
+      {day:'Day2',title:'九份・平溪・野柳',desc:'幻想的な九份の街並み、十分でランタン、野柳の奇岩を巡る'},
+      {day:'Day3',title:'台北市内・帰路',desc:'故宮博物院→忠孝復興でカフェ巡り→免税でお土産→帰路'},
+    ],
+    costs:[['往復航空券','¥30,000〜60,000'],['宿泊（2泊）','¥12,000〜30,000'],['食費（3日分）','¥6,000〜12,000'],['交通・観光','¥5,000〜10,000']],
+    total:'¥53,000〜112,000',
+    tips:['LCC（タイガーエア・ピーチ）で往復3〜4万円も','悠遊カードが超便利','7〜8月は台風シーズン。旅行保険は必ず','Airbnbで民泊するとさらにお得'],
+  },
+  {
+    id:'korea', name:'韓国・ソウル', nameEn:'Seoul, Korea',
+    emoji:'🇰🇷', bg:'linear-gradient(135deg,#3b82f6,#1d4ed8)',
+    region:'海外 / 東アジア', domestic:false,
+    minBudget:45000, maxBudget:150000,
+    tags:{styles:['city_walk','street_food','historic_town'], q2:['taste','beauty','connect'], q3:['food_memory','view_memory','relax_memory'], companion:['solo','couple','friends']},
+    duration:['2days','3days','5days'], area:['asia','any'],
+    matchReasons:{
+      taste:'焼肉・チムタン・チキン・コーヒー文化。食にこだわるあなたに絶対刺さる街です。',
+      connect:'街を歩きながら、ショッピングしながら、会話が弾む旅友との旅に最適。',
+      default:'K-POPの聖地、コスメ天国、焼肉の本場。アクセスよくコスパ高い人気の旅先。',
+    },
+    desc:'K-POPの聖地・弘大、グルメの明洞、歴史の景福宮。ファッション・コスメ・食が揃う街。',
+    chips:['✈️ 約2h','🎤 K-POP','🥩 焼肉','💄 コスメ','🏯 景福宮'],
+    itinerary:[
+      {day:'Day1',title:'明洞・南大門・弘大',desc:'コスメショッピング・屋台グルメ。夜は弘大エリアでナイトライフ'},
+      {day:'Day2',title:'景福宮・仁寺洞・北村',desc:'チマチョゴリレンタルで景福宮を観光。伝統茶屋でひと休み'},
+      {day:'Day3',title:'東大門・帰路',desc:'24時間営業の東大門でファッション買い物、免税でお土産購入'},
+    ],
+    costs:[['往復航空券','¥20,000〜45,000'],['宿泊（2泊）','¥8,000〜25,000'],['食費（3日分）','¥6,000〜12,000'],['ショッピング・観光','¥10,000〜30,000']],
+    total:'¥44,000〜112,000',
+    tips:['格安LCCで往復2万円台のセールも頻繁に','T-moneyカードで移動が便利','Naverマップが現地では最強','ロッテ免税店でコスメ大量買いがお得'],
+  },
+  {
+    id:'thailand', name:'タイ・バンコク&プーケット', nameEn:'Bangkok & Phuket, Thailand',
+    emoji:'🛕', bg:'linear-gradient(135deg,#f59e0b,#16a34a)',
+    region:'海外 / 東南アジア', domestic:false,
+    minBudget:80000, maxBudget:280000,
+    tags:{styles:['beach_resort','historic_town','street_food','adventure_sport'], q2:['beauty','taste','achieve','learn'], q3:['view_memory','food_memory','activity_memory','culture_memory'], companion:['solo','couple','friends','family_kids']},
+    duration:['5days','week','long'], area:['asia','any'],
+    matchReasons:{
+      beauty:'アンダマン海の透明度、ピピ島の絶景、バンコクの寺院群。写真が追いつかない美しさ。',
+      taste:'パッタイ・カオマンガイ・マンゴースティッキーライス。安くて美味いタイ料理の聖地。',
+      achieve:'スキューバダイビング・ロッククライミング・ジャングルトレッキング。挑戦の宝庫。',
+      connect:'物価が安いので、ゆっくりと一緒に過ごす時間をたっぷり取れます。',
+      default:'バンコクとプーケットを組み合わせた定番の大人気コース。文化とビーチの両方を楽しめます。',
+    },
+    desc:'バンコクの寺院・グルメ・ナイトライフとプーケットのビーチリゾートを組み合わせる王道コース。物価安で長期滞在も快適。',
+    chips:['✈️ 約6〜7h','🌊 アンダマン海','🛕 寺院巡り','🌮 タイ料理','🏝️ アイランドホッピング'],
+    itinerary:[
+      {day:'Day1-2',title:'バンコク観光',desc:'ワット・プラケオ→カオサン通り→ルーフトップバー。屋台グルメを堪能'},
+      {day:'Day3',title:'バンコク→プーケット移動',desc:'国内線1時間。夜はパトンビーチ周辺でシーフードディナー'},
+      {day:'Day4-5',title:'アイランドホッピング',desc:'ピピ島・バンブー島でシュノーケリング。エメラルドの海と白砂ビーチ'},
+      {day:'Day6',title:'スパ・ビーチ・帰路',desc:'バリニーズマッサージで疲れを癒し、夕方のビーチで夕日を眺めてから帰路'},
+    ],
+    costs:[['往復航空券','¥40,000〜80,000'],['宿泊（5泊）','¥20,000〜70,000'],['食費（6日分）','¥8,000〜15,000'],['国内線・観光','¥15,000〜30,000']],
+    total:'¥83,000〜195,000',
+    tips:['Grab（タクシーアプリ）で安全に移動','エアアジアで国内線をお得に手配','7〜8月はプーケット雨季。チェンマイは乾季で快適','ホステルなら1泊1,000円〜。ビーチビラは1泊5,000円〜'],
+  },
+  {
+    id:'bali', name:'バリ島', nameEn:'Bali, Indonesia',
+    emoji:'🌺', bg:'linear-gradient(135deg,#10b981,#0ea5e9)',
+    region:'海外 / 東南アジア', domestic:false,
+    minBudget:100000, maxBudget:400000,
+    tags:{styles:['beach_resort','mountain_forest','luxury_hotel','onsen_slow','adventure_sport'], q2:['beauty','connect','achieve'], q3:['view_memory','relax_memory','activity_memory'], companion:['couple','friends','solo']},
+    duration:['5days','week','long'], area:['asia','any'],
+    matchReasons:{
+      beauty:'ウブドの棚田、ウルワツ寺院の夕日、青く光る海。バリは絶景の密度が異常に高い。',
+      connect:'プールヴィラで二人だけの時間。バリの空気が特別な関係を深めてくれます。',
+      achieve:'サーフィン・ダイビング・バリスイング・トレッキング。チャレンジが盛りだくさん。',
+      default:'神々の島・バリ。リゾート感、文化、自然が一つの島に凝縮されています。',
+    },
+    desc:'神々の島・バリ。ウブドの棚田と芸術、クタのビーチ、スミニャックの高級ビラ。リゾート感No.1の旅先。',
+    chips:['✈️ 約8h','🌾 棚田','💆 スパ','🏄 サーフィン','🌅 ケチャ火祭り'],
+    itinerary:[
+      {day:'Day1-2',title:'クタ・スミニャックビーチ',desc:'バリ最大のビーチでサンセット鑑賞。ナイトクラブ・バーも充実'},
+      {day:'Day3',title:'ウブド・テガラランの棚田',desc:'ライステラスでインスタ映え写真。バリスイングも挑戦'},
+      {day:'Day4',title:'ウルワツ寺院・ケチャ火祭り',desc:'断崖絶壁の寺院とサンセット、伝統舞踊ケチャを鑑賞'},
+      {day:'Day5-6',title:'スパ・料理教室・帰路',desc:'バリニーズマッサージで完全回復。バリ料理の料理教室で地元の食文化を体験'},
+    ],
+    costs:[['往復航空券','¥50,000〜100,000'],['宿泊（5泊）','¥25,000〜150,000'],['食費（6日分）','¥8,000〜20,000'],['スパ・観光・交通','¥15,000〜40,000']],
+    total:'¥98,000〜310,000',
+    tips:['スクータレンタルで自由に移動（要国際免許）','ウブドのワルン（食堂）なら1食300円〜','プールヴィラは早期予約で格安になることも','GoJek（配車アプリ）が安くて安心'],
+  },
+  {
+    id:'hawaii', name:'ハワイ', nameEn:'Hawaii, USA',
+    emoji:'🌈', bg:'linear-gradient(135deg,#f97316,#ec4899)',
+    region:'海外 / ハワイ', domestic:false,
+    minBudget:200000, maxBudget:700000,
+    tags:{styles:['beach_resort','mountain_forest','luxury_hotel','adventure_sport'], q2:['beauty','achieve','connect'], q3:['view_memory','activity_memory','relax_memory'], companion:['couple','family_kids','friends','solo']},
+    duration:['5days','week','long'], area:['hawaii','any'],
+    matchReasons:{
+      beauty:'ワイキキのサンセット、ダイヤモンドヘッドからの眺め、マウイ島の星空。一生忘れない景色。',
+      achieve:'ダイヤモンドヘッドトレッキング、ダイビング、サーフィン。達成感が積み重なります。',
+      connect:'家族も友人もカップルも、みんなが楽しめる施設と自然が揃っています。',
+      default:'日本人に最も人気の海外リゾート。安心感と本格的なリゾート感が共存する夢の旅先。',
+    },
+    desc:'日本人が最も愛するリゾート。ワイキキビーチ、ダイヤモンドヘッド、マウイ島。夢のような夏休みを。',
+    chips:['✈️ 約8〜9h','🏄 ワイキキ','🌋 ハレアカラ','🦈 ダイビング','🌺 ルアウ'],
+    itinerary:[
+      {day:'Day1-2',title:'ホノルル・ワイキキ',desc:'ワイキキビーチ・アラモアナSCでショッピング。アサイーボウルとパンケーキを堪能'},
+      {day:'Day3',title:'ノースショア・ダイヤモンドヘッド',desc:'ダイヤモンドヘッドトレッキング→ノースショアでガーリックシュリンプ'},
+      {day:'Day4',title:'マウイ島1日ツアー',desc:'ロードトゥハナをドライブ。ハレアカラでサンライズ鑑賞（要予約）'},
+      {day:'Day5-6',title:'シュノーケリング・ルアウ',desc:'モロキニクレーターでシュノーケリング。夜はルアウショーで締めくくり'},
+    ],
+    costs:[['往復航空券','¥80,000〜180,000'],['宿泊（5泊）','¥80,000〜250,000'],['食費（6日分）','¥30,000〜60,000'],['観光・交通','¥30,000〜60,000']],
+    total:'¥220,000〜550,000',
+    tips:['JAL/ANAマイルでビジネスクラス特典航空券も狙える','コンドミニアムで自炊すれば食費を大幅節約','ハレクラニやフォーシーズンズは早期予約で割引','DFSでの免税ショッピングを忘れずに'],
+  },
+  {
+    id:'europe', name:'ヨーロッパ周遊', nameEn:'Europe',
+    emoji:'🏰', bg:'linear-gradient(135deg,#7c3aed,#2563eb)',
+    region:'海外 / ヨーロッパ', domestic:false,
+    minBudget:280000, maxBudget:800000,
+    tags:{styles:['historic_town','city_walk','street_food','mountain_forest'], q2:['learn','beauty','taste'], q3:['culture_memory','view_memory','food_memory'], companion:['solo','couple','friends']},
+    duration:['week','long'], area:['europe','any'],
+    matchReasons:{
+      learn:'ローマ・パリ・バルセロナ。街全体が生きた博物館。知的好奇心のあるあなたに最高の旅。',
+      beauty:'エッフェル塔の夜景、サグラダファミリアのステンドグラス、フィレンツェの旧市街。芸術の連続。',
+      taste:'フレンチ・イタリアン・スペイン料理。本場の味は、日本で食べてきたものとは別物です。',
+      default:'一生に一度は行きたい、文明の宝庫。長期休暇のあなたへの最高のご褒美旅行。',
+    },
+    desc:'パリ・ローマ・バルセロナなど歴史的都市を巡る憧れの旅。芸術・建築・美食を全身で体感。',
+    chips:['✈️ 約12〜14h','🗼 エッフェル塔','🎨 ルーブル','🏛️ コロッセオ','🍕 本場グルメ'],
+    itinerary:[
+      {day:'Day1-3',title:'パリ',desc:'エッフェル塔、ルーブル、モンマルトル、シャンゼリゼ。カフェ文化に浸る3日間'},
+      {day:'Day4-5',title:'バルセロナ',desc:'サグラダファミリア、カサ・バトリョ。タパスとサングリアで乾杯'},
+      {day:'Day6-8',title:'ローマ',desc:'コロッセオ、バチカン、トレビの泉。本場ジェラートとパスタ三昧'},
+      {day:'Day9-10',title:'アムステルダム・帰路',desc:'運河クルーズ、ゴッホ美術館。風車とチューリップの景色で締めくくり'},
+    ],
+    costs:[['往復航空券','¥100,000〜200,000'],['宿泊（9泊）','¥80,000〜200,000'],['食費（10日分）','¥40,000〜80,000'],['鉄道・観光・ショッピング','¥60,000〜150,000']],
+    total:'¥280,000〜630,000',
+    tips:['ユーレイルパスで鉄道移動をお得に','ユースホステルなら1泊3,000〜5,000円','申根ビザは早めに申請を','スカイスキャナーで複数都市乗り継ぎが格安になることも'],
+  },
+  {
+    id:'maldives', name:'モルディブ', nameEn:'Maldives',
+    emoji:'🏝️', bg:'linear-gradient(135deg,#0ea5e9,#10b981)',
+    region:'海外 / インド洋', domestic:false,
+    minBudget:400000, maxBudget:9999999,
+    tags:{styles:['beach_resort','luxury_hotel','onsen_slow','adventure_sport'], q2:['beauty','connect','achieve'], q3:['view_memory','relax_memory','activity_memory'], companion:['couple','friends']},
+    duration:['5days','week'], area:['any'],
+    matchReasons:{
+      beauty:'水上コテージの下の海、夕日、満天の星。地球上で最も美しい場所の一つです。',
+      connect:'二人だけの時間。世界中のカップルが選ぶ、ロマンス旅行の聖地。',
+      achieve:'マンタ・ウミガメとのダイビング、サンドバンク探検。非日常の体験の連続。',
+      default:'人生で一度は行きたい、地球の宝石。最高の贅沢を、最高の人と。',
+    },
+    desc:'水上コテージに泊まり、透き通った海でシュノーケリング。世界最高峰のラグジュアリーリゾート体験。',
+    chips:['✈️ 約10h+','🌊 水上コテージ','🐠 サンゴ礁','🌅 夕日','🤿 ダイビング'],
+    itinerary:[
+      {day:'Day1',title:'マレ到着・スピードボートで移動',desc:'島のリゾートへ移動。ウェルカムドリンクを飲みながら夕日を眺める'},
+      {day:'Day2-3',title:'ダイビング・シュノーケリング',desc:'世界屈指の透明度のサンゴ礁。マンタやウミガメと遭遇'},
+      {day:'Day4',title:'サンドバンク・夕日クルーズ',desc:'プライベートサンドバンクでビーチピクニック。イルカウォッチングクルーズ'},
+      {day:'Day5',title:'スパ・帰路',desc:'オーバーウォータースパで極上リラクゼーション。名残惜しく出発'},
+    ],
+    costs:[['往復航空券','¥100,000〜200,000'],['リゾート宿泊（4泊）','¥200,000〜500,000'],['食事（フルボード込み）','¥30,000〜80,000'],['アクティビティ','¥30,000〜80,000']],
+    total:'¥360,000〜860,000',
+    tips:['ハネムーン特典（デコレーション・ケーキ）は事前に依頼','オールインクルーシブが食費込みでお得','ローシーズン（5〜10月）は料金が下がる','マリオット等のポイントで泊まれる場合も'],
+  },
+  {
+    id:'amami', name:'奄美大島', nameEn:'Amami Oshima, Japan',
+    emoji:'🦎', bg:'linear-gradient(135deg,#10b981,#0ea5e9)',
+    region:'国内 / 鹿児島県', domestic:true,
+    minBudget:40000, maxBudget:130000,
+    tags:{styles:['beach_resort','mountain_forest','adventure_sport'], q2:['beauty','achieve','learn'], q3:['view_memory','activity_memory','culture_memory'], companion:['solo','couple','friends']},
+    duration:['2days','3days','5days'], area:['domestic','any'],
+    matchReasons:{
+      beauty:'亜熱帯の青い海、マングローブの森、夕日。沖縄より空いていて、より「秘境感」を味わえます。',
+      achieve:'マングローブカヌー、シュノーケリング、ジャングルトレッキング。手つかずの自然が舞台。',
+      learn:'世界自然遺産に登録された固有の生態系。アマミノクロウサギなど希少な生き物が暮らします。',
+      default:'世界自然遺産の秘境。沖縄より空いていて、コスパよく非日常を味わえる穴場の島。',
+    },
+    desc:'世界自然遺産に登録された秘境の島。亜熱帯の森、透明度抜群のビーチ。沖縄より空いていてコスパ◎。',
+    chips:['✈️ 約2h','🐢 ウミガメ','🌿 マングローブ','🦜 固有種','🏄 シュノーケリング'],
+    itinerary:[
+      {day:'Day1',title:'奄美市内・大浜海浜公園',desc:'到着後すぐにビーチへ。夕方は郷土料理「鶏飯」で体を回復'},
+      {day:'Day2',title:'マングローブカヌー・原生林散策',desc:'亜熱帯の森でカヌー体験。運が良ければアマミノクロウサギに出会える'},
+      {day:'Day3',title:'土盛海岸・帰路',desc:'エメラルドグリーンの海でシュノーケリング。カメと一緒に泳ごう'},
+    ],
+    costs:[['往復航空券','¥20,000〜40,000'],['宿泊（2泊）','¥12,000〜30,000'],['レンタカー（2日）','¥10,000〜18,000'],['食費・アクティビティ','¥10,000〜20,000']],
+    total:'¥52,000〜108,000',
+    tips:['JALが多くLCC少なめ。早期予約が必須','レンタカーは必須（バスは本数が少ない）','観光客が少なく地元の人と仲良くなれる','奄美黒糖焼酎とパッションフルーツは要チェック'],
+  },
+  {
+    id:'guam', name:'グアム', nameEn:'Guam, USA',
+    emoji:'🌴', bg:'linear-gradient(135deg,#0ea5e9,#7c3aed)',
+    region:'海外 / 太平洋', domestic:false,
+    minBudget:100000, maxBudget:350000,
+    tags:{styles:['beach_resort','luxury_hotel','city_walk'], q2:['connect','beauty','relax'], q3:['relax_memory','view_memory'], companion:['family_kids','couple','friends']},
+    duration:['3days','5days'], area:['hawaii','any'],
+    matchReasons:{
+      connect:'家族みんなが楽しめるウォーターパーク、ショッピング、ビーチ。全員が満足できる旅先。',
+      beauty:'タモンビーチのサンセット、クリアな海でのシュノーケリング。近場でこの透明度は驚きです。',
+      default:'ビザ不要・時差なし・日本語OK。家族連れの初海外に最適なリゾートです。',
+    },
+    desc:'日本から3.5時間。ビザ不要・時差ほぼなし・日本語が通じる。家族の初海外に最も選ばれるリゾート。',
+    chips:['✈️ 約3.5h','🛍️ 免税ショッピング','🏄 ウォーターパーク','🌊 タモンビーチ','🌺 ルアウ'],
+    itinerary:[
+      {day:'Day1',title:'タモンビーチ・チャモロビレッジ',desc:'到着後すぐにビーチへ。夜はチャモロビレッジでローカルフードを楽しむ'},
+      {day:'Day2',title:'ウォーターパーク・ショッピング',desc:'ガン岩公園→ウォーターパーク→マイクロネシアモールで買い物三昧'},
+      {day:'Day3',title:'シュノーケリング・帰路',desc:'コキ・ビーチでシュノーケリング。免税店で最後のお土産購入'},
+    ],
+    costs:[['往復航空券','¥40,000〜80,000'],['宿泊（2泊）','¥30,000〜80,000'],['食費（3日分）','¥12,000〜25,000'],['観光・ショッピング','¥20,000〜50,000']],
+    total:'¥102,000〜235,000',
+    tips:['ビザ不要・時差+1時間で初海外にも安心','T-ギャラリアで免税ショッピングが充実','ホテルのパッケージツアーがお得','7〜8月は日本人が多いが閑散期セールも'],
+  },
+
+  // ===== ZERO BUDGET =====
+  {
+    id:'picnic_walk', name:'近所の散歩ピクニック旅', nameEn:'Local Walk & Picnic',
+    emoji:'🧺', bg:'linear-gradient(135deg,#10b981,#84cc16)',
+    region:'家の近所 / どこでも', domestic:true,
+    minBudget:0, maxBudget:1000,
+    tags:{styles:['mountain_forest','onsen_slow'], q2:['beauty','connect','taste'], q3:['relax_memory','food_memory','view_memory'], companion:['solo','couple','family_kids','family_adult','friends']},
+    duration:['2days'], area:['domestic','any'],
+    matchReasons:{
+      beauty:'いつも見ている景色が、ゆっくり歩くと全然違って見える。日常の中の絶景を発見する旅。',
+      connect:'お金をかけなくても、一緒にいる時間が豊かならそれが最高の旅。おにぎりを一緒に作るところから始まる。',
+      taste:'家で作ったおにぎり・サンドイッチ・コーヒー。手作りのものを外で食べる美味しさは格別です。',
+      default:'お金は一切かからない。でも記憶に残る一日になる。それが本当の旅の本質かもしれない。',
+    },
+    desc:'家にあるものでおにぎりを作って、近所の公園・川辺・海辺・丘へ。お金ゼロで、最高に豊かな時間を作る旅。',
+    chips:['💰 費用ゼロ','🍙 手作りおにぎり','🚶 散歩','🌳 公園・川・海辺','📷 日常の絶景探し'],
+    itinerary:[
+      {day:'朝', title:'おにぎり・お弁当づくり', desc:'冷蔵庫にあるもので。梅・鮭・昆布・残り物。ラップに包んで完成。コーヒーも水筒に。'},
+      {day:'午前', title:'目的地へ徒歩 or 自転車', desc:'近所でもいつもと違う道を選ぶ。初めて気づく路地・花・景色がある。'},
+      {day:'昼', title:'お気に入りの場所でピクニック', desc:'芝生に座って、空を見上げながら手作りご飯を食べる。スマホをしまってみる。'},
+      {day:'午後', title:'のんびり散策・帰り道', desc:'気になるものを写真に撮りながら帰る。夕焼けを見たら完璧な一日。'},
+    ],
+    costs:[['食材（おにぎり・飲み物）','¥0〜500円（家にあるもので）'],['交通費','¥0（徒歩・自転車）'],['入場料・観光費','¥0（公園・川・海は無料）'],['合計','¥0〜500円']],
+    total:'¥0〜500円',
+    tips:['「いつも通る道」を逆方向から歩くだけで別世界に見える','図書館・美術館は無料開放日がある（市区町村のHPで確認）','川べりや海岸は無料で最高のロケーション','地元の道の駅・朝市は安くて地元色が強い'],
+  },
+  {
+    id:'cycling_trip', name:'自転車サイクリング旅', nameEn:'Cycling Day Trip',
+    emoji:'🚴', bg:'linear-gradient(135deg,#84cc16,#0ea5e9)',
+    region:'自宅周辺〜近郊 / 国内', domestic:true,
+    minBudget:0, maxBudget:3000,
+    tags:{styles:['mountain_forest','beach_resort','city_walk'], q2:['achieve','beauty','connect'], q3:['activity_memory','view_memory','relax_memory'], companion:['solo','couple','friends']},
+    duration:['2days'], area:['domestic','any'],
+    matchReasons:{
+      achieve:'自分の足でたどり着いた場所には、格別な達成感がある。距離と景色が比例する旅。',
+      beauty:'車では通り過ぎる景色を、自転車なら止まって吸い込める。風の匂い、坂の先の絶景。',
+      connect:'並んで漕ぎながら話す会話は、カフェで向き合うより深くなることがある。',
+      default:'電車でも車でも行けない「ちょうどいい距離」を走る旅。達成感と景色が待っている。',
+    },
+    desc:'自転車（または徒歩）で近郊をめぐる。コンビニで休憩してもいい。ゴールは自分で決める、自由な旅。',
+    chips:['💰 ほぼ無料','🚴 自転車','🏞️ 河川敷・サイクリングロード','🏪 コンビニ休憩','🌅 夕日ゴール'],
+    itinerary:[
+      {day:'朝', title:'出発準備', desc:'水・おにぎり・スマホ充電・簡単な地図確認。行き先は「なんとなく北」でもOK。'},
+      {day:'午前', title:'ひたすら漕ぐ', desc:'河川敷・海沿い・農道・峠。知らない道が宝の地図。'},
+      {day:'昼', title:'コンビニor公園で休憩', desc:'100円のホットコーヒーと肉まん。意外と最高に美味しい。'},
+      {day:'午後', title:'折り返し・帰路', desc:'来た道を違う道で帰る。夕日を背に帰るのが一番気持ちいい。'},
+    ],
+    costs:[['食費（コンビニ・持参）','¥500〜1,500円'],['交通費','¥0（自転車）'],['その他','¥0'],['合計','¥500〜1,500円']],
+    total:'¥500〜1,500円',
+    tips:['Googleマップの「自転車ルート」機能で安全なルートを確認','川沿いのサイクリングロードは信号なしで快適','レンタサイクルでも1日1,000〜2,000円','ヘルメットと飲み水は必須'],
+  },
+  {
+    id:'free_explore', name:'無料スポット・街歩き旅', nameEn:'Free City Exploration',
+    emoji:'🗺️', bg:'linear-gradient(135deg,#8b5cf6,#10b981)',
+    region:'近隣の街 / 国内', domestic:true,
+    minBudget:0, maxBudget:5000,
+    tags:{styles:['historic_town','city_walk'], q2:['learn','beauty','taste'], q3:['culture_memory','view_memory','food_memory'], companion:['solo','couple','friends']},
+    duration:['2days'], area:['domestic','any'],
+    matchReasons:{
+      learn:'無料の博物館・史跡・図書館。お金をかけずに知識と感動が得られる場所は意外と多い。',
+      beauty:'地元の商店街・路地裏・古い建物。知っているようで知らない「地元の美しさ」がある。',
+      taste:'スーパーの惣菜・地元のパン屋・100円ローソン。「安くて美味い」の聖地巡礼。',
+      default:'近くにいるのに行ったことがない場所が必ずある。それを発見する旅が一番安くて豊かかもしれない。',
+    },
+    desc:'電車1本+徒歩で行ける近隣の街を丸一日探索。無料の博物館・公園・史跡・商店街。散歩コスト以外ほぼゼロ。',
+    chips:['💰 交通費のみ','🏛️ 無料博物館','🛖 商店街','🌿 公園・緑地','📚 図書館'],
+    itinerary:[
+      {day:'朝', title:'電車で近隣の街へ', desc:'行ったことのない駅で降りる。それだけで冒険の始まり。'},
+      {day:'午前', title:'無料スポット巡り', desc:'市区町村の博物館・郷土資料館・公園・神社・旧跡（入場無料が多い）。'},
+      {day:'昼', title:'スーパー・商店街でランチ調達', desc:'地元のパン屋・総菜コーナーで100〜500円のランチ。公園で食べる。'},
+      {day:'午後', title:'路地裏・図書館・カフェ', desc:'図書館で本を読んでもいい。知らない路地を歩いてもいい。ゆっくりが正解。'},
+    ],
+    costs:[['電車代（往復）','¥200〜1,000円'],['食費','¥300〜800円'],['入場料','¥0（無料スポット選択）'],['合計','¥500〜2,000円']],
+    total:'¥500〜2,000円',
+    tips:['「近くの無料博物館」でGoogle検索すると意外な場所が見つかる','図書館は冷房完備・無料・快適','地元の朝市・マルシェは無料で覗ける','「ついで旅」で近くの気になるスポットをメモしておく'],
+  },
+
+  // ===== ULTRA LUXURY =====
+  {
+    id:'private_jet_world', name:'プライベートジェット世界一周', nameEn:'Private Jet World Tour',
+    emoji:'✈️', bg:'linear-gradient(135deg,#1a1a2e,#f59e0b)',
+    region:'全世界 / 青天井プラン', domestic:false,
+    minBudget:500000000, maxBudget:999999999999,
+    tags:{styles:['beach_resort','historic_town','luxury_hotel','street_food','mountain_forest'], q2:['beauty','taste','learn','achieve'], q3:['view_memory','food_memory','culture_memory','activity_memory'], companion:['solo','couple','friends','family_adult']},
+    duration:['week','long'], area:['any'],
+    matchReasons:{
+      beauty:'ガラパゴス諸島、マチュピチュ、オーロラ、アンコールワット。地球の絶景を専用機で巡る旅。',
+      taste:'世界の三つ星レストランをジェットで渡り歩く。ミシュランを手土産に世界を食べ尽くす。',
+      learn:'大英博物館貸切、ルーブル閉館後のVIP鑑賞、学者付きガイドのガラパゴス探検。知の最前線へ。',
+      achieve:'エベレストベースキャンプヘリツアー、南極大陸上陸、マリアナ海溝潜水。人類の挑戦の場所へ。',
+      connect:'大切な人と、地球で最も美しい場所を、時間を気にせず巡る。それ以上の贅沢はない。',
+      default:'時間もルートも自由。世界の名所をプライベートジェットで渡り歩く、究極の旅。',
+    },
+    desc:'専用チャーター機で世界の名所をホッピング。ファーストクラスを超えた「空の邸宅」で、行きたい場所へ、行きたい時に。',
+    chips:['✈️ 専用ジェット','🏨 超高級ホテルスイート','🍽️ 三つ星レストラン','🛥️ プライベートヨット','🎩 コンシェルジュ同行'],
+    itinerary:[
+      {day:'Day1-2', title:'ドバイ　バーブ・アル・アラブ最上階スイート', desc:'7つ星ホテルのロイヤルスイート（1泊500万円〜）。水上ヘリポートに着陸。砂漠でプライベートサファリ。'},
+      {day:'Day3-4', title:'モルディブ　無人島プライベート貸切', desc:'リゾートアイランドを1週間完全貸切。自分だけの海、自分だけの夕日。専属シェフ・マッサージ師常駐。'},
+      {day:'Day5-6', title:'南フランス　ヴィラ&ヨットクルーズ', desc:'カンヌのプライベートヴィラに滞在。地中海をスーパーヨットでクルーズ。セレブと同じ港に停泊。'},
+      {day:'Day7-8', title:'ニューヨーク　ペントハウス&百老匯VIP', desc:'マンハッタン最上階ペントハウス（1泊300万円〜）。ブロードウェイを貸切観覧、MoMAを閉館後に独占鑑賞。'},
+    ],
+    costs:[['プライベートジェット（1週間）','¥3,000万〜1億円'],['宿泊（7泊・最高級）','¥1,000万〜5,000万円'],['食事（三つ星・専属シェフ）','¥500万〜2,000万円'],['アクティビティ・コンシェルジュ','¥500万〜5,000万円']],
+    total:'¥5,000万〜2億円（1人・1週間）',
+    tips:['NetJetsやVistaJetなどのプライベートアビエーションサービスを契約', 'コンシェルジュサービス（Quintessentially等）が全て手配してくれる','島の貸切はFour Seasons Private Island・Necker Island等', 'ヨット手配はBluewater Yachtingなどのブローカー経由が確実'],
+  },
+  {
+    id:'luxury_cruise', name:'豪華客船世界一周クルーズ', nameEn:'World Cruise - Luxury Liner',
+    emoji:'🚢', bg:'linear-gradient(135deg,#1e3a5f,#0ea5e9)',
+    region:'全世界の海 / 青天井プラン', domestic:false,
+    minBudget:10000000, maxBudget:999999999999,
+    tags:{styles:['beach_resort','luxury_hotel','historic_town','street_food'], q2:['beauty','connect','taste','learn'], q3:['view_memory','relax_memory','culture_memory','food_memory'], companion:['couple','family_adult','friends','solo']},
+    duration:['long'], area:['any'],
+    matchReasons:{
+      beauty:'毎朝、船の窓から違う絶景が広がる。地中海・カリブ海・南太平洋・フィヨルド。海から見る世界は別次元。',
+      connect:'広大な海の上、大切な人と時間を忘れて過ごす。非日常の船上生活が絆を深める。',
+      taste:'乗客数百人分の専属シェフが腕を振るう24時間のレストラン。世界各港で本場グルメも。',
+      learn:'地中海→スエズ→インド洋→東南アジア→太平洋。地球の地理と文化を船旅で体感する。',
+      default:'「海の上の宮殿」で世界をめぐる。寄港地のたびに、新しい国が目の前に現れる究極の旅。',
+    },
+    desc:'リージェントセブンシーズ・シルバーシー・クリスタルなど超高級クルーズラインで世界一周。すべてオールインクルーシブ。',
+    chips:['🚢 豪華客船','🌍 世界一周','🍾 オールインクルーシブ','🎭 船内エンタメ','⚓ 各港で観光'],
+    itinerary:[
+      {day:'横浜出港', title:'スタート。太平洋を渡る', desc:'スイートルームに乗り込む。プールサイドでシャンパン。船上でのんびり。'},
+      {day:'2週目', title:'ハワイ・カリブ海', desc:'ホノルル、マウイ島に寄港。カリブの島々でビーチと免税品。'},
+      {day:'3〜4週目', title:'地中海クルーズ', desc:'バルセロナ、ローマ、アテネに寄港。世界遺産を船のバルコニーから眺める贅沢。'},
+      {day:'5〜6週目', title:'スエズ運河→アジア→帰港', desc:'ドバイ、インド、シンガポール、香港に寄港。各地で専属ガイドによるVIPツアー。'},
+    ],
+    costs:[['スイートキャビン（60日・2人）','¥2,000万〜1億円'],['オールインクルーシブ（食事・酒・エンタメ）','込み'],['各港のVIPツアー','¥100万〜500万円'],['フライト（横浜まで）','¥100万〜（ビジネス/プライベート）']],
+    total:'¥2,500万〜1.5億円（2人・2ヶ月）',
+    tips:['Regent Seven Seas・Silversea・Crystal Cruisesが最高峰','スイートルームは1〜2年前から完売。早期予約必須','旅行代理店ではなく高級クルーズ専門エージェントへ','船内スパ・カジノ・ショー・料理教室が全て無料（オールインクルーシブ）'],
+  },
+  {
+    id:'island_buyout', name:'プライベートアイランド貸切＆遊園地貸切', nameEn:'Private Island & Theme Park Buyout',
+    emoji:'🏝️', bg:'linear-gradient(135deg,#f59e0b,#ef4444)',
+    region:'世界中 / 青天井プラン', domestic:false,
+    minBudget:100000000, maxBudget:999999999999,
+    tags:{styles:['beach_resort','luxury_hotel','adventure_sport','onsen_slow'], q2:['achieve','beauty','connect'], q3:['activity_memory','view_memory','relax_memory'], companion:['couple','friends','family_kids','family_adult']},
+    duration:['5days','week','long'], area:['any'],
+    matchReasons:{
+      achieve:'遊園地の全アトラクションを誰にも並ばず乗り放題。島を丸ごと購入して好き放題に過ごす。',
+      beauty:'プライベートアイランドの夕日は、自分だけのもの。世界で最も「完全な絶景」を所有する体験。',
+      connect:'大切な家族や友人だけを島に招いて、世界一贅沢なパーティーを開く。お金で作る究極の思い出。',
+      default:'島を貸し切る。遊園地を貸し切る。「お金があれば何でもできる」の究極形がここにある。',
+    },
+    desc:'ネッカー島・リチャード・ブランソンの島を貸切。あるいはUSJ・ディズニーランドをクローズドで貸切。お金でしか買えない体験。',
+    chips:['🏝️ 島まるごと貸切','🎡 遊園地貸切','🎆 専属花火師','🎸 招待アーティスト','🍽️ ミシュランシェフ派遣'],
+    itinerary:[
+      {day:'Day1', title:'プライベートアイランド到着', desc:'ヘリコプターで上陸。招待客30〜50名と専属スタッフ100名が出迎え。島全体があなただけのもの。'},
+      {day:'Day2-3', title:'島での過ごし方は自由', desc:'マリンスポーツ放題、スパ、プール、釣り、ジェットスキー。夜は専属バンドの演奏とBBQパーティー。'},
+      {day:'Day4', title:'遊園地（USJ/TDL）完全貸切', desc:'開園から閉園まで貸切。全アトラクション待ち時間ゼロ。専属フォトグラファー同行で思い出を記録。'},
+      {day:'Day5', title:'専属花火師による締めくくり', desc:'夜空に打ち上げる個人花火大会。あなたのためだけの花火。世界一贅沢なエンディング。'},
+    ],
+    costs:[['プライベートアイランド貸切（1週間）','¥5,000万〜5億円'],['遊園地貸切（1日）','¥5,000万〜2億円（USJ等）'],['専属シェフ・スタッフ費用','¥1,000万〜5,000万円'],['エンタメ（花火・アーティスト等）','¥1,000万〜10億円']],
+    total:'¥1億〜20億円（イベント規模による）',
+    tips:['Necker Island（ブランソン所有）は1週間約1億円〜。公式サイトから直接予約','USJ・TDL貸切は個人には非公開。エージェント経由で交渉可能','専属花火師は「日本煙火芸術協会」に相談','ミシュラン三つ星シェフの出張料理は事前に数ヶ月の調整が必要'],
+  },
+];
+
+// ======== WIZARD LOGIC ========
+function startWizard() {
+  document.getElementById('wizard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  goStep(1);
+}
+
+function goStep(n) {
+  document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  for (let i = 1; i <= 4; i++) {
+    const ps = document.getElementById('ps' + i);
+    ps.classList.remove('active','done');
+    if (i < n) ps.classList.add('done');
+    else if (i === n) ps.classList.add('active');
+    if (i <= 3) document.getElementById('pl' + i).classList.toggle('done', i < n);
+  }
+}
+
+function pick1(el, val) {
+  document.querySelectorAll('#step1 .opt-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  S.companion = val;
+  document.getElementById('next1').disabled = false;
+}
+
+// q-opt multi-select via event delegation (avoids `this` context issues)
+['q1','q2','q3'].forEach(qid => {
+  document.getElementById(qid).addEventListener('click', function(e) {
+    const opt = e.target.closest('.q-opt');
+    if (!opt) return;
+    const val = opt.dataset.val;
+    const set = S[qid];
+    if (set.has(val)) {
+      set.delete(val);
+      opt.classList.remove('selected');
+    } else {
+      set.add(val);
+      opt.classList.add('selected');
+    }
+    checkStep2();
+  });
+});
+
+function checkStep2() {
+  document.getElementById('next2').disabled = !(S.q1.size > 0 && S.q2.size > 0 && S.q3.size > 0);
+}
+
+function toggleVision(el, val) {
+  if (S.visions.has(val)) { S.visions.delete(val); el.classList.remove('selected'); }
+  else { S.visions.add(val); el.classList.add('selected'); }
+  document.getElementById('next3').disabled = S.visions.size === 0;
+}
+
+const BDGDATA = [
+  {label:'0円 🌿', sub:'お金をかけない旅。家にあるもので、最高の時間を作る。', val:0, free:true},
+  {label:'〜5,000円', sub:'交通費のみ。近場の公園・川・海辺・無料スポットへ。', val:5000},
+  {label:'〜3万円', sub:'日帰り〜1泊の近場旅行に。', val:30000},
+  {label:'〜5万円', sub:'格安LCCで国内旅行や近隣アジアへ。', val:50000},
+  {label:'〜10万円', sub:'アジア旅行や国内リゾートに最適な予算です。', val:100000},
+  {label:'〜20万円', sub:'ハワイ・バリ島など人気リゾートへ。', val:200000},
+  {label:'〜30万円', sub:'ヨーロッパや贅沢な旅が可能に。', val:300000},
+  {label:'〜50万円', sub:'プレミアムリゾートや超高級ホテルへ。', val:500000},
+  {label:'〜100万円', sub:'モルディブ・プライベートヴィラも夢じゃない。', val:1000000},
+  {label:'〜1,000万円', sub:'クルーズ・チャーター機・VIP専用体験が揃う。', val:10000000},
+  {label:'青天井 ∞ 👑', sub:'資産1,000億円以上の方へ。プライベートジェット・島貸切・豪華客船・遊園地貸切。お金で解決できる限り、すべてが選択肢に。', val:999999999999, ultra:true},
+];
+function updateBdg(v) {
+  S.budgetIdx = parseInt(v);
+  const b = BDGDATA[S.budgetIdx];
+  document.getElementById('bdgNum').textContent = b.label;
+  document.getElementById('bdgSub').textContent = b.sub;
+  // Special styling
+  const numEl = document.getElementById('bdgNum');
+  if (b.free) numEl.style.color = '#10b981';
+  else if (b.ultra) numEl.style.color = '#f59e0b';
+  else numEl.style.color = 'var(--primary)';
+  document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('selected'));
+}
+function setBdgPreset(v) {
+  S.budgetIdx = v;
+  document.getElementById('bdgSlider').value = v;
+  updateBdg(v);
+  const presets = [0,2,4,6,8,10];
+  document.querySelectorAll('.preset-chip').forEach((c, i) => c.classList.toggle('selected', presets[i] === v));
+}
+
+let durSet = false, areaSet = false;
+function pickDur(el, val) {
+  document.querySelectorAll('#step4 .opt-grid:nth-of-type(1) .opt-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected'); S.duration = val; durSet = true; checkSearch();
+}
+function pickArea(el, val) {
+  document.querySelectorAll('#step4 .opt-grid:nth-of-type(2) .opt-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected'); S.area = val; areaSet = true; checkSearch();
+}
+function checkSearch() {
+  document.getElementById('searchBtn').disabled = !(durSet && areaSet);
+}
+
+// ======== SCORING ========
+function scoreDestination(d) {
+  let score = 0;
+  const bdg = BDGDATA[S.budgetIdx];
+  const budget = bdg.val;
+
+  // Free plan: only show zero-budget destinations
+  if (bdg.free) {
+    if (d.maxBudget <= 5000) score += 60;
+    else return -1;
+  }
+  // Ultra luxury: only show ultra-luxury destinations
+  else if (bdg.ultra) {
+    if (d.minBudget >= 10000000) score += 60;
+    else return -1;
+  }
+  // Budget match for normal range
+  else if (budget >= d.minBudget && budget <= d.maxBudget) score += 25;
+  else if (budget >= d.minBudget) score += 10;
+  else return -1; // can't afford: exclude
+
+  // Personality / q2 match — score for each selected value
+  if (d.tags.q2) S.q2.forEach(v => { if (d.tags.q2.includes(v)) score += 10; });
+
+  // q3 match — score for each selected value
+  if (d.tags.q3) S.q3.forEach(v => { if (d.tags.q3.includes(v)) score += 9; });
+
+  // Vision match
+  S.visions.forEach(v => { if (d.tags.styles && d.tags.styles.includes(v)) score += 8; });
+
+  // Companion match
+  if (d.tags.companion && d.tags.companion.includes(S.companion)) score += 10;
+
+  // Duration
+  if (d.duration && d.duration.includes(S.duration)) score += 8;
+
+  // Area
+  if (d.area && (d.area.includes(S.area) || S.area === 'any' || d.area.includes('any'))) score += 8;
+
+  return score;
+}
+
+function getMatchReason(d) {
+  // Find the best matching reason from all selected q2 values
+  for (const v of S.q2) {
+    if (d.matchReasons[v]) return d.matchReasons[v];
+  }
+  return d.matchReasons.default || d.desc;
+}
+
+// ======== SHOW RESULTS ========
+let allScored = [];
+
+function showResults() {
+  allScored = DESTS.map(d => ({ ...d, score: scoreDestination(d) }))
+    .filter(d => d.score >= 0)
+    .sort((a, b) => b.score - a.score);
+
+  const persona = buildPersona();
+  const budget = BDGDATA[S.budgetIdx];
+  const companionLabel = { solo:'一人旅', couple:'パートナーとの旅', family_kids:'家族旅行', family_adult:'家族旅行', friends:'友人との旅' };
+
+  document.getElementById('personaBanner').innerHTML = `
+    <div class="persona-emoji">${persona.emoji}</div>
+    <div>
+      <div class="persona-type">あなたの旅タイプ</div>
+      <div class="persona-name">${persona.name}</div>
+      <div class="persona-desc">${persona.desc}</div>
+    </div>
+  `;
+  const durMap = {'2days':'1泊2日','3days':'2泊3日','5days':'4〜5日','week':'1週間','long':'2週間+'};
+  document.getElementById('resultsSub').textContent =
+    `${companionLabel[S.companion]} ／ 予算 ${budget.label} ／ ${durMap[S.duration] || ''} の条件でスコアリングしました`;
+
+  document.getElementById('wizard').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  document.querySelectorAll('.fil-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.fil-tab').classList.add('active');
+
+  renderDests(allScored);
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderDests(dests) {
+  const grid = document.getElementById('destGrid');
+  const noRes = document.getElementById('noRes');
+  if (!dests.length) { grid.innerHTML = ''; noRes.style.display = 'block'; return; }
+  noRes.style.display = 'none';
+  grid.innerHTML = dests.map((d, i) => `
+    <div class="dest-card ${i < 3 ? 'top-pick' : ''}" onclick="openModal('${d.id}')">
+      <div class="dest-img" style="background:${d.bg}">
+        ${d.emoji}
+        ${i < 3 ? `<div class="dest-rank">${['🥇 1位','🥈 2位','🥉 3位'][i]}</div>` : ''}
+        <div class="dest-badge ${d.domestic ? 'badge-cheap' : d.minBudget >= 300000 ? 'badge-luxury' : 'badge-match'}">${d.domestic ? '国内' : '海外'}</div>
+      </div>
+      <div class="dest-body">
+        <div class="dest-name">${d.name}</div>
+        <div class="dest-region">${d.region}</div>
+        <div class="dest-reason">💡 ${getMatchReason(d)}</div>
+        <div class="dest-desc">${d.desc}</div>
+        <div class="dest-chips">${d.chips.map(c => `<span class="chip">${c}</span>`).join('')}</div>
+        <div class="dest-footer">
+          <div><div class="dest-budget-label">目安予算（1人）</div><div class="dest-budget-val">${d.costs[d.costs.length-1][1]}</div></div>
+        </div>
+        <button class="detail-btn">詳細プランを見る →</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterR(type, el) {
+  document.querySelectorAll('.fil-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const budget = BDGDATA[S.budgetIdx].val;
+  let dests = allScored;
+  if (type === 'domestic') dests = allScored.filter(d => d.domestic);
+  else if (type === 'overseas') dests = allScored.filter(d => !d.domestic);
+  else if (type === 'budget_ok') dests = allScored.filter(d => budget >= d.minBudget);
+  else if (type === 'top') dests = allScored.slice(0, 4);
+  renderDests(dests);
+}
+
+function openModal(id) {
+  const d = DESTS.find(x => x.id === id);
+  if (!d) return;
+  document.getElementById('mImg').style.background = d.bg;
+  document.getElementById('mImg').innerHTML = `<span style="font-size:88px">${d.emoji}</span><button class="modal-close" onclick="closeModal()">✕</button>`;
+
+  const costRows = d.costs.map((c, i) =>
+    i === d.costs.length - 1
+      ? `<tr><td><strong>合計目安（1人）</strong></td><td>${d.total}</td></tr>`
+      : `<tr><td>${c[0]}</td><td>${c[1]}</td></tr>`
+  ).join('');
+
+  document.getElementById('mBody').innerHTML = `
+    <div class="modal-title">${d.name}</div>
+    <div class="modal-region">${d.nameEn} / ${d.region}</div>
+    <div class="modal-reason">💡 ${getMatchReason(d)}</div>
+    <p style="font-size:13px;color:#4b5563;line-height:1.7;margin-bottom:4px">${d.desc}</p>
+    <div class="modal-sec">📅 サンプルスケジュール</div>
+    <ul class="itin">
+      ${d.itinerary.map(it => `
+        <li>
+          <div class="itin-day">${it.day.replace('Day','D')}</div>
+          <div><div class="itin-title">${it.title}</div><div class="itin-desc">${it.desc}</div></div>
+        </li>`).join('')}
+    </ul>
+    <div class="modal-sec">💰 費用の目安（1人あたり）</div>
+    <table class="cost-tbl">${costRows}</table>
+    <div class="modal-sec">💡 節約・計画のコツ</div>
+    <ul class="tips-ul">${d.tips.map(t => `<li>${t}</li>`).join('')}</ul>
+  `;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeOverlay(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+
+function resetAll() {
+  Object.assign(S, { companion:'', q1:new Set(), q2:new Set(), q3:new Set(), visions:new Set(), budgetIdx:4, duration:'', area:'' });
+  durSet = false; areaSet = false;
+  document.querySelectorAll('.opt-card,.q-opt').forEach(c => c.classList.remove('selected'));
+  document.getElementById('next1').disabled = true;
+  document.getElementById('next2').disabled = true;
+  document.getElementById('next3').disabled = true;
+  document.getElementById('searchBtn').disabled = true;
+  updateBdg(4); setBdgPreset(4); // index 4 = 〜10万円
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('wizard').style.display = 'block';
+  goStep(1);
+  document.getElementById('wizard').scrollIntoView({ behavior: 'smooth' });
+}
+
+// init
+updateBdg(4);
+setBdgPreset(4); // 〜10万円をデフォルトに
+</script>
+</body>
+</html>
