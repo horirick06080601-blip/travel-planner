@@ -320,6 +320,27 @@
       </div>
     </div>
 
+    <div class="q-section">
+      <div class="q-label"><span class="q-num">4</span>理想の旅のペースはどれですか？</div>
+      <div class="q-opts" id="q4">
+        <div class="q-opt" data-val="slow_travel"><span class="q-ico">🐢</span><div><div class="q-text">ゆっくり一ヶ所にどっぷり。急がず、のんびり過ごしたい</div><div class="q-sub">滞在型・癒し重視</div></div></div>
+        <div class="q-opt" data-val="active_travel"><span class="q-ico">⚡</span><div><div class="q-text">朝から動いて、できるだけ多くの場所や体験をしたい</div><div class="q-sub">アクティブ・詰め込み型</div></div></div>
+        <div class="q-opt" data-val="balanced_travel"><span class="q-ico">⚖️</span><div><div class="q-text">観光とのんびりをバランスよく。メリハリをつけて楽しみたい</div><div class="q-sub">バランス型・万能タイプ</div></div></div>
+        <div class="q-opt" data-val="spontaneous_travel"><span class="q-ico">🎲</span><div><div class="q-text">その日の気分で行き先を決める。計画より自由を楽しみたい</div><div class="q-sub">気まま・行き当たりばったり</div></div></div>
+      </div>
+    </div>
+
+    <div class="q-section">
+      <div class="q-label"><span class="q-num">5</span>どんな宿に泊まりたいですか？</div>
+      <div class="q-opts" id="q5">
+        <div class="q-opt" data-val="luxury_stay"><span class="q-ico">🏨</span><div><div class="q-text">上質なホテルやリゾート。空間ごと贅沢を味わいたい</div><div class="q-sub">高級・ラグジュアリー</div></div></div>
+        <div class="q-opt" data-val="local_stay"><span class="q-ico">🏠</span><div><div class="q-text">民宿・ゲストハウスで、現地の暮らしや文化に触れたい</div><div class="q-sub">ローカル・文化体験重視</div></div></div>
+        <div class="q-opt" data-val="design_stay"><span class="q-ico">✨</span><div><div class="q-text">おしゃれなデザインホテルで、非日常感を楽しみたい</div><div class="q-sub">デザイン・スタイリッシュ</div></div></div>
+        <div class="q-opt" data-val="nature_stay"><span class="q-ico">⛺</span><div><div class="q-text">グランピング・キャンプで、自然の中に眠りたい</div><div class="q-sub">アウトドア・自然派</div></div></div>
+        <div class="q-opt" data-val="onsen_stay"><span class="q-ico">♨️</span><div><div class="q-text">温泉旅館でゆっくり。日本の旅館文化を堪能したい</div><div class="q-sub">温泉・和風旅館</div></div></div>
+      </div>
+    </div>
+
     <div class="step-nav">
       <button class="btn btn-ghost" onclick="goStep(1)">← 戻る</button>
       <button class="btn btn-primary" id="next2" onclick="goStep(3)" disabled>次へ →</button>
@@ -437,7 +458,7 @@
 const S = {
   homeCountry: '',
   companion: '',
-  q1: new Set(), q2: new Set(), q3: new Set(),
+  q1: new Set(), q2: new Set(), q3: new Set(), q4: new Set(), q5: new Set(),
   visions: new Set(),
   budgetIdx: 4,
   duration: '',
@@ -998,7 +1019,7 @@ function checkStep1() {
 }
 
 // q-opt multi-select via event delegation (avoids `this` context issues)
-['q1','q2','q3'].forEach(qid => {
+['q1','q2','q3','q4','q5'].forEach(qid => {
   document.getElementById(qid).addEventListener('click', function(e) {
     const opt = e.target.closest('.q-opt');
     if (!opt) return;
@@ -1016,7 +1037,7 @@ function checkStep1() {
 });
 
 function checkStep2() {
-  document.getElementById('next2').disabled = !(S.q1.size > 0 && S.q2.size > 0 && S.q3.size > 0);
+  document.getElementById('next2').disabled = !(S.q1.size > 0 && S.q2.size > 0 && S.q3.size > 0 && S.q4.size > 0 && S.q5.size > 0);
 }
 
 function toggleVision(el, val) {
@@ -1097,6 +1118,31 @@ function scoreDestination(d) {
 
   // q3 match — score for each selected value
   if (d.tags.q3) S.q3.forEach(v => { if (d.tags.q3.includes(v)) score += 9; });
+
+  // q4 match — 旅のペース（既存stylesタグにマッピング）
+  const q4StyleMap = {
+    slow_travel:       ['onsen_slow','luxury_hotel','historic_town'],
+    active_travel:     ['adventure_sport','mountain_forest','city_walk'],
+    balanced_travel:   ['city_walk','beach_resort','historic_town','street_food'],
+    spontaneous_travel:['city_walk','street_food','mountain_forest','beach_resort']
+  };
+  if (d.tags.styles) S.q4.forEach(v => {
+    const styles = q4StyleMap[v] || [];
+    if (styles.some(s => d.tags.styles.includes(s))) score += 7;
+  });
+
+  // q5 match — 宿泊スタイル（既存stylesタグにマッピング）
+  const q5StyleMap = {
+    luxury_stay:  ['luxury_hotel','beach_resort'],
+    local_stay:   ['historic_town','street_food','city_walk'],
+    design_stay:  ['city_walk','luxury_hotel'],
+    nature_stay:  ['mountain_forest','beach_resort','adventure_sport'],
+    onsen_stay:   ['onsen_slow']
+  };
+  if (d.tags.styles) S.q5.forEach(v => {
+    const styles = q5StyleMap[v] || [];
+    if (styles.some(s => d.tags.styles.includes(s))) score += 7;
+  });
 
   // Vision match
   S.visions.forEach(v => { if (d.tags.styles && d.tags.styles.includes(v)) score += 8; });
@@ -1241,7 +1287,7 @@ function closeOverlay(e) { if (e.target === document.getElementById('overlay')) 
 function closeModal() { document.getElementById('overlay').classList.remove('open'); }
 
 function resetAll() {
-  Object.assign(S, { homeCountry:'', companion:'', q1:new Set(), q2:new Set(), q3:new Set(), visions:new Set(), budgetIdx:4, duration:'', area:'' });
+  Object.assign(S, { homeCountry:'', companion:'', q1:new Set(), q2:new Set(), q3:new Set(), q4:new Set(), q5:new Set(), visions:new Set(), budgetIdx:4, duration:'', area:'' });
   durSet = false; areaSet = false;
   // 国内カードをリセット（再び選択可能に）
   const domesticCard = document.getElementById('areaCardDomestic');
