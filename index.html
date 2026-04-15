@@ -80,7 +80,7 @@
   }
   .opt-card:hover { border-color: var(--primary); background: #f5f3ff; transform: translateY(-2px); }
   .opt-card.selected { border-color: var(--primary); background: #eef2ff; }
-  .opt-card .ico { font-size: 36px; display: block; margin-bottom: 10px; }
+  .opt-card .ico { font-size: 36px; display: flex; align-items: center; justify-content: center; height: 46px; margin-bottom: 10px; overflow: hidden; line-height: 1; }
   .opt-card .lbl { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
   .opt-card .sub { font-size: 12px; color: var(--muted); line-height: 1.4; }
   .opt-card.selected::after {
@@ -206,6 +206,9 @@
 
   .reset-btn { display: block; margin: 40px auto; padding: 13px 30px; border-radius: 50px; border: 2px solid var(--border); background: #fff; color: var(--muted); font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
   .reset-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .restart-mini-btn { background: none; border: 1.5px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: var(--muted); cursor: pointer; transition: all 0.2s; white-space: nowrap; font-weight: 600; }
+  .restart-mini-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .progress-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 
   .no-res { text-align: center; padding: 60px 20px; color: var(--muted); }
   .no-res .ico { font-size: 48px; margin-bottom: 16px; }
@@ -233,6 +236,10 @@
 <div class="wizard" id="wizard">
 
   <!-- Progress -->
+  <div class="progress-top">
+    <div style="font-size:12px;color:var(--muted);font-weight:600;">診断中...</div>
+    <button class="restart-mini-btn" onclick="resetAll()">↺ 最初から始める</button>
+  </div>
   <div class="progress-wrap" id="progressWrap">
     <div class="prog-step active" id="ps1"><div class="prog-dot" data-icon="👥"><span class="prog-num">1</span></div><div class="prog-label">あなたは？</div></div>
     <div class="prog-line" id="pl1"></div>
@@ -252,7 +259,7 @@
       <div class="opt-card" onclick="pick1(this,'solo')"><span class="ico">🧳</span><div class="lbl">一人旅</div><div class="sub">自分のペースで、自由に</div></div>
       <div class="opt-card" onclick="pick1(this,'couple')"><span class="ico">💑</span><div class="lbl">パートナーと</div><div class="sub">二人でロマンチックに</div></div>
       <div class="opt-card" onclick="pick1(this,'family_kids')"><span class="ico">👨‍👩‍👧‍👦</span><div class="lbl">家族（子あり）</div><div class="sub">子どもも一緒に楽しく</div></div>
-      <div class="opt-card" onclick="pick1(this,'family_adult')"><span class="ico">👨‍👩‍👴‍👵</span><div class="lbl">家族（大人のみ）</div><div class="sub">親・兄弟・親戚と</div></div>
+      <div class="opt-card" onclick="pick1(this,'family_adult')"><span class="ico">🧑‍🤝‍🧑</span><div class="lbl">家族（大人のみ）</div><div class="sub">親・兄弟・親戚と</div></div>
       <div class="opt-card" onclick="pick1(this,'friends')"><span class="ico">🎉</span><div class="lbl">友人たちと</div><div class="sub">みんなでワイワイ</div></div>
     </div>
     <div class="step-nav"><div></div><button class="btn btn-primary" id="next1" onclick="goStep(2)" disabled>次へ →</button></div>
