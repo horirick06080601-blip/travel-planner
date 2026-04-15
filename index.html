@@ -26,11 +26,22 @@
     background: linear-gradient(150deg, #6366f1 0%, #a855f7 50%, #f97316 100%);
     color: #fff; text-align: center; padding: 72px 24px 100px; position: relative; overflow: hidden;
   }
+  .hero-bg-img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
+    filter: brightness(0.45) saturate(1.2);
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(150deg, rgba(99,102,241,0.60) 0%, rgba(168,85,247,0.45) 50%, rgba(249,115,22,0.60) 100%);
+  }
   .hero::after {
     content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 60px;
-    background: var(--bg); clip-path: ellipse(55% 100% at 50% 100%);
+    background: var(--bg); clip-path: ellipse(55% 100% at 50% 100%); z-index: 2;
   }
-  .hero-emoji { font-size: 64px; display: block; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+  .hero-emoji { font-size: 64px; display: block; margin-bottom: 20px; animation: float 3s ease-in-out infinite; position: relative; z-index: 3; }
+  .hero h1 { position: relative; z-index: 3; }
+  .hero p { position: relative; z-index: 3; }
+  .hero-btn { position: relative; z-index: 3; }
   @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
   .hero h1 { font-size: clamp(26px,5vw,46px); font-weight: 900; margin-bottom: 14px; letter-spacing: -0.5px; }
   .hero p { font-size: 17px; opacity: 0.92; max-width: 520px; margin: 0 auto 36px; line-height: 1.7; }
@@ -235,6 +246,7 @@
 
 <!-- HERO -->
 <div class="hero">
+  <img class="hero-bg-img" src="https://images.unsplash.com/photo-RkrC5EYlWjc?w=1600&q=80&fit=crop" alt="旅行を楽しむ人々" loading="eager" onerror="this.style.display='none'">
   <span class="hero-emoji">✈️</span>
   <h1>あなただけの夏旅を見つけよう</h1>
   <p>予算より先に、あなた自身のことを教えてください。<br>何に幸せを感じる人なのかを知ることで、本当に満足できる旅行が見えてきます。</p>
@@ -635,7 +647,7 @@ const DESTS = [
   {
     id:'okinawa', name:'沖縄', nameEn:'Okinawa, Japan',
     emoji:'🏝️', bg:'linear-gradient(135deg,#06b6d4,#0ea5e9)',
-    photo:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-Tkzy4US_AtE?w=800&q=80&fit=crop',
     region:'国内 / 沖縄県', domestic:true,
     minBudget:60000, maxBudget:200000,
     tags:{styles:['beach_resort','adventure_sport'], q2:['beauty','taste','achieve'], q3:['view_memory','food_memory','activity_memory'], companion:['solo','couple','family_kids','friends']},
@@ -661,7 +673,7 @@ const DESTS = [
   {
     id:'hokkaido', name:'北海道', nameEn:'Hokkaido, Japan',
     emoji:'🌿', bg:'linear-gradient(135deg,#10b981,#059669)',
-    photo:'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-YKfF_ARKhLc?w=800&q=80&fit=crop',
     region:'国内 / 北海道', domestic:true,
     minBudget:60000, maxBudget:200000,
     tags:{styles:['mountain_forest','street_food'], q2:['beauty','taste','learn'], q3:['food_memory','view_memory','relax_memory'], companion:['solo','couple','family_adult','friends']},
@@ -687,7 +699,7 @@ const DESTS = [
   {
     id:'kyoto', name:'京都・大阪', nameEn:'Kyoto & Osaka, Japan',
     emoji:'⛩️', bg:'linear-gradient(135deg,#f59e0b,#ef4444)',
-    photo:'https://images.unsplash.com/photo-1493780474015-ba834fd0ce2f?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-J_wGqRwEUEg?w=800&q=80&fit=crop',
     region:'国内 / 関西', domestic:true,
     minBudget:35000, maxBudget:150000,
     tags:{styles:['historic_town','street_food','city_walk'], q2:['learn','taste','beauty'], q3:['culture_memory','food_memory','view_memory'], companion:['solo','couple','family_adult','friends']},
@@ -712,7 +724,7 @@ const DESTS = [
   {
     id:'taiwan', name:'台湾', nameEn:'Taiwan',
     emoji:'🥟', bg:'linear-gradient(135deg,#e11d48,#f97316)',
-    photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-AL8hAcmhHEo?w=800&q=80&fit=crop',
     region:'海外 / 東アジア', domestic:false,
     minBudget:60000, maxBudget:180000,
     tags:{styles:['street_food','historic_town','mountain_forest','city_walk'], q2:['taste','learn','beauty'], q3:['food_memory','culture_memory','view_memory'], companion:['solo','couple','friends']},
@@ -737,7 +749,7 @@ const DESTS = [
   {
     id:'korea', name:'韓国・ソウル', nameEn:'Seoul, Korea',
     emoji:'🇰🇷', bg:'linear-gradient(135deg,#3b82f6,#1d4ed8)',
-    photo:'https://images.unsplash.com/photo-1538485399081-7191377e8241?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-T5NIVYYfynY?w=800&q=80&fit=crop',
     region:'海外 / 東アジア', domestic:false,
     minBudget:45000, maxBudget:150000,
     tags:{styles:['city_walk','street_food','historic_town'], q2:['taste','beauty','connect'], q3:['food_memory','view_memory','relax_memory'], companion:['solo','couple','friends']},
@@ -761,7 +773,7 @@ const DESTS = [
   {
     id:'thailand', name:'タイ・バンコク&プーケット', nameEn:'Bangkok & Phuket, Thailand',
     emoji:'🛕', bg:'linear-gradient(135deg,#f59e0b,#16a34a)',
-    photo:'https://images.unsplash.com/photo-1552465011-b4e21bf6e3f3?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-KipWnQeqUhc?w=800&q=80&fit=crop',
     region:'海外 / 東南アジア', domestic:false,
     minBudget:80000, maxBudget:280000,
     tags:{styles:['beach_resort','historic_town','street_food','adventure_sport'], q2:['beauty','taste','achieve','learn'], q3:['view_memory','food_memory','activity_memory','culture_memory'], companion:['solo','couple','friends','family_kids']},
@@ -788,7 +800,7 @@ const DESTS = [
   {
     id:'bali', name:'バリ島', nameEn:'Bali, Indonesia',
     emoji:'🌺', bg:'linear-gradient(135deg,#10b981,#0ea5e9)',
-    photo:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-jN9JnZ-SyVc?w=800&q=80&fit=crop',
     region:'海外 / 東南アジア', domestic:false,
     minBudget:100000, maxBudget:400000,
     tags:{styles:['beach_resort','mountain_forest','luxury_hotel','onsen_slow','adventure_sport'], q2:['beauty','connect','achieve'], q3:['view_memory','relax_memory','activity_memory'], companion:['couple','friends','solo']},
@@ -814,7 +826,7 @@ const DESTS = [
   {
     id:'hawaii', name:'ハワイ', nameEn:'Hawaii, USA',
     emoji:'🌈', bg:'linear-gradient(135deg,#f97316,#ec4899)',
-    photo:'https://images.unsplash.com/photo-1505852679233-d9fd70aff56d?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-BlEzokI0k58?w=800&q=80&fit=crop',
     region:'海外 / ハワイ', domestic:false,
     minBudget:200000, maxBudget:700000,
     tags:{styles:['beach_resort','mountain_forest','luxury_hotel','adventure_sport'], q2:['beauty','achieve','connect'], q3:['view_memory','activity_memory','relax_memory'], companion:['couple','family_kids','friends','solo']},
@@ -840,7 +852,7 @@ const DESTS = [
   {
     id:'europe', name:'ヨーロッパ周遊', nameEn:'Europe',
     emoji:'🏰', bg:'linear-gradient(135deg,#7c3aed,#2563eb)',
-    photo:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-Q0-fOL2nqZc?w=800&q=80&fit=crop',
     region:'海外 / ヨーロッパ', domestic:false,
     minBudget:280000, maxBudget:800000,
     tags:{styles:['historic_town','city_walk','street_food','mountain_forest'], q2:['learn','beauty','taste'], q3:['culture_memory','view_memory','food_memory'], companion:['solo','couple','friends']},
@@ -866,7 +878,7 @@ const DESTS = [
   {
     id:'maldives', name:'モルディブ', nameEn:'Maldives',
     emoji:'🏝️', bg:'linear-gradient(135deg,#0ea5e9,#10b981)',
-    photo:'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-imQcNKOnLTA?w=800&q=80&fit=crop',
     region:'海外 / インド洋', domestic:false,
     minBudget:400000, maxBudget:9999999,
     tags:{styles:['beach_resort','luxury_hotel','onsen_slow','adventure_sport'], q2:['beauty','connect','achieve'], q3:['view_memory','relax_memory','activity_memory'], companion:['couple','friends']},
@@ -892,7 +904,7 @@ const DESTS = [
   {
     id:'amami', name:'奄美大島', nameEn:'Amami Oshima, Japan',
     emoji:'🦎', bg:'linear-gradient(135deg,#10b981,#0ea5e9)',
-    photo:'https://images.unsplash.com/photo-1559128010-7c1ad6e1d6a3?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-lH3EhF8lqWs?w=800&q=80&fit=crop',
     region:'国内 / 鹿児島県', domestic:true,
     minBudget:40000, maxBudget:130000,
     tags:{styles:['beach_resort','mountain_forest','adventure_sport'], q2:['beauty','achieve','learn'], q3:['view_memory','activity_memory','culture_memory'], companion:['solo','couple','friends']},
@@ -917,7 +929,7 @@ const DESTS = [
   {
     id:'guam', name:'グアム', nameEn:'Guam, USA',
     emoji:'🌴', bg:'linear-gradient(135deg,#0ea5e9,#7c3aed)',
-    photo:'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-BJ-FvNGCfEY?w=800&q=80&fit=crop',
     region:'海外 / 太平洋', domestic:false,
     minBudget:100000, maxBudget:350000,
     tags:{styles:['beach_resort','luxury_hotel','city_walk'], q2:['connect','beauty','relax'], q3:['relax_memory','view_memory'], companion:['family_kids','couple','friends']},
@@ -943,7 +955,7 @@ const DESTS = [
   {
     id:'picnic_walk', name:'近所の散歩ピクニック旅', nameEn:'Local Walk & Picnic',
     emoji:'🧺', bg:'linear-gradient(135deg,#10b981,#84cc16)',
-    photo:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-2ni0fhQU5kk?w=800&q=80&fit=crop',
     region:'家の近所 / どこでも', domestic:true,
     minBudget:0, maxBudget:1000,
     tags:{styles:['mountain_forest','onsen_slow'], q2:['beauty','connect','taste'], q3:['relax_memory','food_memory','view_memory'], companion:['solo','couple','family_kids','family_adult','friends']},
@@ -1023,7 +1035,7 @@ const DESTS = [
   {
     id:'private_jet_world', name:'プライベートジェット世界一周', nameEn:'Private Jet World Tour',
     emoji:'✈️', bg:'linear-gradient(135deg,#1a1a2e,#f59e0b)',
-    photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-tTXIKYNnNPs?w=800&q=80&fit=crop',
     region:'全世界 / 青天井プラン', domestic:false,
     minBudget:500000000, maxBudget:999999999999,
     tags:{styles:['beach_resort','historic_town','luxury_hotel','street_food','mountain_forest'], q2:['beauty','taste','learn','achieve'], q3:['view_memory','food_memory','culture_memory','activity_memory'], companion:['solo','couple','friends','family_adult']},
@@ -1051,7 +1063,7 @@ const DESTS = [
   {
     id:'luxury_cruise', name:'豪華客船世界一周クルーズ', nameEn:'World Cruise - Luxury Liner',
     emoji:'🚢', bg:'linear-gradient(135deg,#1e3a5f,#0ea5e9)',
-    photo:'https://images.unsplash.com/photo-1548574505-5e239809f93f?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-ZUDRodxxKSI?w=800&q=80&fit=crop',
     region:'全世界の海 / 青天井プラン', domestic:false,
     minBudget:10000000, maxBudget:999999999999,
     tags:{styles:['beach_resort','luxury_hotel','historic_town','street_food'], q2:['beauty','connect','taste','learn'], q3:['view_memory','relax_memory','culture_memory','food_memory'], companion:['couple','family_adult','friends','solo']},
@@ -1078,7 +1090,7 @@ const DESTS = [
   {
     id:'island_buyout', name:'プライベートアイランド貸切＆遊園地貸切', nameEn:'Private Island & Theme Park Buyout',
     emoji:'🏝️', bg:'linear-gradient(135deg,#f59e0b,#ef4444)',
-    photo:'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80&fit=crop',
+    photo:'https://images.unsplash.com/photo-EoCLHvM4W4E?w=800&q=80&fit=crop',
     region:'世界中 / 青天井プラン', domestic:false,
     minBudget:100000000, maxBudget:999999999999,
     tags:{styles:['beach_resort','luxury_hotel','adventure_sport','onsen_slow'], q2:['achieve','beauty','connect'], q3:['activity_memory','view_memory','relax_memory'], companion:['couple','friends','family_kids','family_adult']},
