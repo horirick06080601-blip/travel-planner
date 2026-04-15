@@ -135,15 +135,20 @@
   #results { display: none; max-width: 1100px; margin: 0 auto 80px; padding: 0 16px; }
 
   .persona-banner {
-    background: linear-gradient(135deg, var(--primary), #a855f7);
-    color: #fff; border-radius: var(--radius); padding: 32px 36px;
-    margin-bottom: 40px; display: flex; align-items: center; gap: 24px;
-    box-shadow: 0 8px 32px rgba(99,102,241,0.25);
+    position: relative; overflow: hidden;
+    color: #fff; border-radius: var(--radius); padding: 40px 36px 36px;
+    margin-bottom: 40px;
+    box-shadow: 0 12px 40px rgba(99,102,241,0.3);
   }
-  .persona-emoji { font-size: 56px; flex-shrink: 0; }
+  .persona-bg-deco { position: absolute; right: -24px; bottom: -24px; font-size: 180px; opacity: 0.12; pointer-events: none; z-index: 0; line-height: 1; user-select: none; }
+  .persona-content { position: relative; z-index: 1; }
+  .persona-type-badge { display: inline-block; background: rgba(255,255,255,0.25); border-radius: 50px; padding: 4px 14px; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+  .persona-main-emoji { font-size: 64px; display: block; margin-bottom: 12px; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
   .persona-type { font-size: 12px; font-weight: 700; letter-spacing: 2px; opacity: 0.85; margin-bottom: 6px; text-transform: uppercase; }
-  .persona-name { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
-  .persona-desc { font-size: 14px; opacity: 0.9; line-height: 1.6; }
+  .persona-name { font-size: 28px; font-weight: 900; margin-bottom: 12px; line-height: 1.2; }
+  .persona-desc { font-size: 14px; opacity: 0.92; line-height: 1.7; margin-bottom: 20px; max-width: 560px; }
+  .share-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.22); border: 1.5px solid rgba(255,255,255,0.5); border-radius: 50px; padding: 10px 22px; font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; transition: all 0.2s; }
+  .share-btn:hover { background: rgba(255,255,255,0.35); transform: translateY(-1px); }
 
   .results-sub { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 28px; }
 
@@ -158,9 +163,13 @@
   .dest-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(99,102,241,0.18); }
   .dest-card.top-pick { border-color: var(--primary); }
 
-  .dest-img { height: 172px; display: flex; align-items: center; justify-content: center; font-size: 70px; position: relative; }
-  .dest-rank { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.45); color: #fff; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 50px; backdrop-filter: blur(6px); }
-  .dest-badge { position: absolute; top: 12px; right: 12px; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 50px; }
+  .dest-img { height: 210px; position: relative; overflow: hidden; }
+  .dest-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; transition: transform 0.5s; }
+  .dest-card:hover .dest-photo { transform: scale(1.06); }
+  .dest-photo-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.55) 100%); z-index: 2; }
+  .dest-emoji-badge { position: absolute; bottom: 14px; left: 16px; font-size: 36px; z-index: 3; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); line-height: 1; }
+  .dest-rank { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.55); color: #fff; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 50px; backdrop-filter: blur(6px); z-index: 3; }
+  .dest-badge { position: absolute; top: 12px; right: 12px; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 50px; z-index: 3; }
   .badge-match { background: var(--primary); color: #fff; }
   .badge-cheap { background: var(--green); color: #fff; }
   .badge-luxury { background: #7c3aed; color: #fff; }
@@ -487,127 +496,127 @@ function buildPersona() {
 
   const PERSONAS = [
     {
-      emoji:'🌄', name:'絶景ハンター',
+      emoji:'🌄', name:'絶景ハンター', bg:'linear-gradient(135deg,#f59e0b,#ef4444)',
       desc:'息をのむような景色を求めて旅する人。「この景色を見るために生きている」と思える瞬間が人生の宝物。カメラを片手に、まだ誰も知らない絶景を探し続けます。',
       score:()=> (has(q2,'beauty')?3:0)+(has(q3,'view_memory')?3:0)+(has(q4,'active_travel')?2:0)+(has(q1,'outdoor')?1:0)
     },
     {
-      emoji:'📸', name:'フォトグラファー旅人',
+      emoji:'📸', name:'フォトグラファー旅人', bg:'linear-gradient(135deg,#64748b,#3b82f6)',
       desc:'旅先の光、色、瞬間を写真に収めることが最大の喜び。同じ場所でも、季節や時間を変えて何度でも訪れる。シャッターを切る瞬間が旅のクライマックス。',
       score:()=> (has(q2,'beauty')?3:0)+(has(q3,'view_memory')?3:0)+(has(q4,'slow_travel')?2:0)+(has(q1,'explore')?1:0)
     },
     {
-      emoji:'🍜', name:'本場グルメ探検家',
+      emoji:'🍜', name:'本場グルメ探検家', bg:'linear-gradient(135deg,#ef4444,#f97316)',
       desc:'旅の目的は「食」一択。現地の市場・屋台・名店を食べ歩き、食の記憶を積み重ねていく旅人。「あの味をもう一度」のために、また旅に出る。',
       score:()=> (has(q2,'taste')?4:0)+(has(q3,'food_memory')?3:0)+(has(q4,'spontaneous_travel')?1:0)+(has(q1,'social')?1:0)
     },
     {
-      emoji:'🍣', name:'食文化・美食研究者',
+      emoji:'🍣', name:'食文化・美食研究者', bg:'linear-gradient(135deg,#dc2626,#b91c1c)',
       desc:'食を通して文化を理解する人。レシピや食材の背景、食文化の歴史にまで興味が及ぶ食の知識人。ミシュランより地元のおばちゃんの店が好き。',
       score:()=> (has(q2,'taste')?3:0)+(has(q3,'food_memory')?2:0)+(has(q2,'learn')?2:0)+(has(q5,'local_stay')?2:0)
     },
     {
-      emoji:'🍷', name:'高級美食・グルメ旅行家',
+      emoji:'🍷', name:'高級美食・グルメ旅行家', bg:'linear-gradient(135deg,#7c3aed,#dc2626)',
       desc:'食の最高峰を知りたい人。ミシュランレストラン・高級ワイン・上質な食体験のために旅する。美食と高級ホテルがセットで完成する旅のスタイル。',
       score:()=> (has(q2,'taste')?3:0)+(has(q5,'luxury_stay')?3:0)+(has(q3,'food_memory')?2:0)+(has(q4,'slow_travel')?1:0)
     },
     {
-      emoji:'🏄', name:'アドベンチャー派',
+      emoji:'🏄', name:'アドベンチャー派', bg:'linear-gradient(135deg,#0ea5e9,#10b981)',
       desc:'日常では味わえないスリルと達成感を求める行動派。ダイビング・トレッキング・サーフィン。体を動かし、限界を超えることが旅の喜び。',
       score:()=> (has(q2,'achieve')?3:0)+(has(q3,'activity_memory')?3:0)+(has(q4,'active_travel')?3:0)+(has(q1,'outdoor')?1:0)
     },
     {
-      emoji:'🏔️', name:'山岳・自然チャレンジャー',
+      emoji:'🏔️', name:'山岳・自然チャレンジャー', bg:'linear-gradient(135deg,#065f46,#047857)',
       desc:'大自然の中でこそ本当の自分に出会える人。山・森・川・荒野に飛び込んでいく冒険心の持ち主。テントと星空があれば幸せ。',
       score:()=> (has(q2,'achieve')?2:0)+(has(q3,'activity_memory')?2:0)+(has(q5,'nature_stay')?3:0)+(has(q1,'outdoor')?2:0)
     },
     {
-      emoji:'🤿', name:'海洋冒険者',
+      emoji:'🤿', name:'海洋冒険者', bg:'linear-gradient(135deg,#0369a1,#0ea5e9)',
       desc:'海の中の世界に魅了された人。珊瑚礁・熱帯魚・ウミガメ。水面の下に広がる別世界を求めて、青い海のある場所に引き寄せられる。',
       score:()=> (has(q3,'activity_memory')?2:0)+(has(q5,'nature_stay')?1:0)+(has(q1,'outdoor')?2:0)+(has(q2,'beauty')?2:0)+(has(q2,'achieve')?1:0)
     },
     {
-      emoji:'🏛️', name:'文化・歴史探求者',
+      emoji:'🏛️', name:'文化・歴史探求者', bg:'linear-gradient(135deg,#7c3aed,#4f46e5)',
       desc:'知らない歴史や文化に触れて視野を広げる知的旅人。博物館・史跡・遺跡が何より楽しい。旅先で買うのはお土産より本。',
       score:()=> (has(q2,'learn')?3:0)+(has(q3,'culture_memory')?3:0)+(has(q4,'slow_travel')?2:0)+(has(q1,'explore')?1:0)
     },
     {
-      emoji:'📚', name:'知的好奇心旅人',
+      emoji:'📚', name:'知的好奇心旅人', bg:'linear-gradient(135deg,#4f46e5,#2563eb)',
       desc:'旅は最高の学校。歴史・文化・社会・自然を肌で感じ、知識と視野を広げることが旅の本質。旅から帰ると、少しだけ賢くなっている気がする。',
       score:()=> (has(q2,'learn')?4:0)+(has(q3,'culture_memory')?2:0)+(has(q4,'balanced_travel')?1:0)+(has(q1,'explore')?1:0)
     },
     {
-      emoji:'🎨', name:'アート・デザイン巡り派',
+      emoji:'🎨', name:'アート・デザイン巡り派', bg:'linear-gradient(135deg,#ec4899,#8b5cf6)',
       desc:'美しいもの・カッコいいもの・おしゃれなものを求めて旅する人。美術館・建築・デザインホテル・ギャラリーが旅のメインイベント。',
       score:()=> (has(q2,'beauty')?2:0)+(has(q2,'learn')?2:0)+(has(q5,'design_stay')?3:0)+(has(q3,'culture_memory')?1:0)
     },
     {
-      emoji:'🎭', name:'ローカル没入旅人',
+      emoji:'🎭', name:'ローカル没入旅人', bg:'linear-gradient(135deg,#b45309,#d97706)',
       desc:'観光地より、地元の人が暮らす場所に惹かれる人。住むように旅し、その街のリズムに溶け込むことで、本物の文化を体験したい。',
       score:()=> (has(q5,'local_stay')?3:0)+(has(q4,'slow_travel')?2:0)+(has(q2,'learn')?1:0)+(has(q2,'connect')?1:0)+(has(q3,'culture_memory')?1:0)
     },
     {
-      emoji:'♨️', name:'温泉・和文化癒し派',
+      emoji:'♨️', name:'温泉・和文化癒し派', bg:'linear-gradient(135deg,#be185d,#9d174d)',
       desc:'旅に行くなら温泉旅館。畳の上でごろごろ、露天風呂から星を眺め、会席料理をゆっくり味わう。日本の旅文化の粋を堪能する人。',
       score:()=> (has(q5,'onsen_stay')?4:0)+(has(q4,'slow_travel')?2:0)+(has(q3,'relax_memory')?2:0)+(has(q1,'relax')?1:0)
     },
     {
-      emoji:'💎', name:'ラグジュアリーリゾート派',
+      emoji:'💎', name:'ラグジュアリーリゾート派', bg:'linear-gradient(135deg,#1e3a5f,#7c3aed)',
       desc:'旅に行くなら妥協しない主義。最高のホテル・料理・サービスで、完璧な非日常を楽しむ贅沢派。上質な空間と時間こそが最高のリフレッシュ。',
       score:()=> (has(q5,'luxury_stay')?4:0)+(has(q3,'relax_memory')?2:0)+(has(q4,'slow_travel')?1:0)+(has(q2,'connect')?1:0)
     },
     {
-      emoji:'🌿', name:'デジタルデトックス旅人',
+      emoji:'🌿', name:'デジタルデトックス旅人', bg:'linear-gradient(135deg,#166534,#15803d)',
       desc:'スマホを置いて、自然の中でリセットしたい人。森の香り・川のせせらぎ・満天の星。自然に包まれると、本来の自分に戻れる気がする。',
       score:()=> (has(q5,'nature_stay')?3:0)+(has(q3,'relax_memory')?2:0)+(has(q4,'slow_travel')?2:0)+(has(q1,'outdoor')?2:0)
     },
     {
-      emoji:'🧘', name:'ウェルネス・スパ旅人',
+      emoji:'🧘', name:'ウェルネス・スパ旅人', bg:'linear-gradient(135deg,#9d174d,#be185d)',
       desc:'心と体を整えることが旅の目的。ヨガ・瞑想・スパ・自然の中での深呼吸。日常のストレスをゼロにリセットする「整える旅」が好き。',
       score:()=> (has(q3,'relax_memory')?3:0)+(has(q4,'slow_travel')?2:0)+(has(q5,'luxury_stay')||has(q5,'onsen_stay')||has(q5,'nature_stay')?2:0)+(has(q2,'connect')?1:0)
     },
     {
-      emoji:'🌸', name:'日本の美・和文化探求者',
+      emoji:'🌸', name:'日本の美・和文化探求者', bg:'linear-gradient(135deg,#be123c,#e11d48)',
       desc:'日本の四季・伝統文化・侘び寂びの美学に惹かれる人。神社仏閣、温泉地、里山、古民家。日本の奥深さを旅で掘り下げたい。',
       score:()=> (S.area==='domestic'?2:0)+(has(q5,'onsen_stay')?2:0)+(has(q2,'beauty')||has(q2,'learn')?2:0)+(has(q3,'culture_memory')||has(q3,'view_memory')?1:0)+(has(q1,'relax')||has(q1,'explore')?1:0)
     },
     {
-      emoji:'💑', name:'ロマンチック二人旅',
+      emoji:'💑', name:'ロマンチック二人旅', bg:'linear-gradient(135deg,#db2777,#ec4899)',
       desc:'大切なパートナーと、特別な時間と思い出を作りたい人。二人だけの空間・夕日・キャンドルディナー。旅で二人の絆がさらに深まる。',
       score:()=> (comp==='couple'?4:0)+(has(q2,'connect')?2:0)+(has(q3,'relax_memory')?1:0)+((has(q5,'luxury_stay')||has(q5,'onsen_stay'))?2:0)
     },
     {
-      emoji:'👨‍👩‍👧', name:'ファミリー旅人',
+      emoji:'👨‍👩‍👧', name:'ファミリー旅人', bg:'linear-gradient(135deg,#d97706,#f59e0b)',
       desc:'家族みんなが笑顔になれる旅が最高。子どもの「すごい！」という顔が旅の一番の報酬。家族の共通の思い出が、一番の宝物だと知っている。',
       score:()=> (comp==='family_kids'?5:0)+(comp==='family_adult'?3:0)+(has(q2,'connect')?2:0)
     },
     {
-      emoji:'🎉', name:'友人グループ旅の企画者',
+      emoji:'🎉', name:'友人グループ旅の企画者', bg:'linear-gradient(135deg,#7c3aed,#ec4899)',
       desc:'みんなで計画して、みんなで盛り上がる旅が最高。幹事をやるのが好きで、全員が楽しめるプランを考えるのが得意な頼れる存在。',
       score:()=> (comp==='friends'?4:0)+(has(q1,'social')?2:0)+(has(q2,'connect')?1:0)+((has(q4,'active_travel')||has(q4,'balanced_travel'))?1:0)
     },
     {
-      emoji:'🗺️', name:'バックパッカー気質',
+      emoji:'🗺️', name:'バックパッカー気質', bg:'linear-gradient(135deg,#374151,#6b7280)',
       desc:'計画より自由を愛する旅人。安宿に泊まり・現地の人と交流し・予期せぬ出会いを楽しむ。旅の醍醐味は「想定外」にある、と知っている。',
       score:()=> (has(q4,'spontaneous_travel')?3:0)+(has(q5,'local_stay')?3:0)+(has(q1,'explore')?2:0)+(has(q2,'connect')||has(q2,'learn')?1:0)
     },
     {
-      emoji:'🌐', name:'世界を歩く探検家',
+      emoji:'🌐', name:'世界を歩く探検家', bg:'linear-gradient(135deg,#0369a1,#7c3aed)',
       desc:'地球の広さを体で感じたい人。見知らぬ国の文化・言語・人に飛び込んでいく好奇心の塊。「まだ行ったことのない国」リストが旅のモチベーション。',
       score:()=> (has(q1,'explore')?2:0)+(has(q2,'learn')?2:0)+(has(q4,'spontaneous_travel')?2:0)+(S.area==='any'?2:0)
     },
     {
-      emoji:'⚡', name:'アクティブ計画派',
+      emoji:'⚡', name:'アクティブ計画派', bg:'linear-gradient(135deg,#0891b2,#0ea5e9)',
       desc:'旅は攻略するもの。効率よく観光スポットを回り、体験を最大化する行動派。旅のしおりを作り込む段階から旅が始まっている。',
       score:()=> (has(q4,'active_travel')?3:0)+(has(q2,'achieve')?2:0)+(has(q3,'activity_memory')?2:0)+(has(q1,'outdoor')||has(q1,'explore')?1:0)
     },
     {
-      emoji:'😌', name:'のんびり自由人',
+      emoji:'😌', name:'のんびり自由人', bg:'linear-gradient(135deg,#10b981,#6ee7b7)',
       desc:'ゆっくり流れる時間の中で、自分を取り戻す旅が好き。カフェでぼーっとしたり、あてもなく歩いたり。目的のなさが、最高の贅沢。',
       score:()=> (has(q4,'slow_travel')?2:0)+(has(q4,'spontaneous_travel')?2:0)+(has(q3,'relax_memory')?2:0)+(has(q1,'relax')?2:0)
     },
     {
-      emoji:'✈️', name:'自由な旅人',
+      emoji:'✈️', name:'自由な旅人', bg:'linear-gradient(135deg,#6366f1,#a855f7)',
       desc:'旅のスタイルは固定しない。その時の気分・一緒に行く人・目的によって旅を変えられる柔軟な旅人。どんな旅でも楽しめるのが強み。',
       score:()=> 0
     },
@@ -626,6 +635,7 @@ const DESTS = [
   {
     id:'okinawa', name:'沖縄', nameEn:'Okinawa, Japan',
     emoji:'🏝️', bg:'linear-gradient(135deg,#06b6d4,#0ea5e9)',
+    photo:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80&fit=crop',
     region:'国内 / 沖縄県', domestic:true,
     minBudget:60000, maxBudget:200000,
     tags:{styles:['beach_resort','adventure_sport'], q2:['beauty','taste','achieve'], q3:['view_memory','food_memory','activity_memory'], companion:['solo','couple','family_kids','friends']},
@@ -651,6 +661,7 @@ const DESTS = [
   {
     id:'hokkaido', name:'北海道', nameEn:'Hokkaido, Japan',
     emoji:'🌿', bg:'linear-gradient(135deg,#10b981,#059669)',
+    photo:'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=800&q=80&fit=crop',
     region:'国内 / 北海道', domestic:true,
     minBudget:60000, maxBudget:200000,
     tags:{styles:['mountain_forest','street_food'], q2:['beauty','taste','learn'], q3:['food_memory','view_memory','relax_memory'], companion:['solo','couple','family_adult','friends']},
@@ -676,6 +687,7 @@ const DESTS = [
   {
     id:'kyoto', name:'京都・大阪', nameEn:'Kyoto & Osaka, Japan',
     emoji:'⛩️', bg:'linear-gradient(135deg,#f59e0b,#ef4444)',
+    photo:'https://images.unsplash.com/photo-1493780474015-ba834fd0ce2f?w=800&q=80&fit=crop',
     region:'国内 / 関西', domestic:true,
     minBudget:35000, maxBudget:150000,
     tags:{styles:['historic_town','street_food','city_walk'], q2:['learn','taste','beauty'], q3:['culture_memory','food_memory','view_memory'], companion:['solo','couple','family_adult','friends']},
@@ -700,6 +712,7 @@ const DESTS = [
   {
     id:'taiwan', name:'台湾', nameEn:'Taiwan',
     emoji:'🥟', bg:'linear-gradient(135deg,#e11d48,#f97316)',
+    photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&fit=crop',
     region:'海外 / 東アジア', domestic:false,
     minBudget:60000, maxBudget:180000,
     tags:{styles:['street_food','historic_town','mountain_forest','city_walk'], q2:['taste','learn','beauty'], q3:['food_memory','culture_memory','view_memory'], companion:['solo','couple','friends']},
@@ -724,6 +737,7 @@ const DESTS = [
   {
     id:'korea', name:'韓国・ソウル', nameEn:'Seoul, Korea',
     emoji:'🇰🇷', bg:'linear-gradient(135deg,#3b82f6,#1d4ed8)',
+    photo:'https://images.unsplash.com/photo-1538485399081-7191377e8241?w=800&q=80&fit=crop',
     region:'海外 / 東アジア', domestic:false,
     minBudget:45000, maxBudget:150000,
     tags:{styles:['city_walk','street_food','historic_town'], q2:['taste','beauty','connect'], q3:['food_memory','view_memory','relax_memory'], companion:['solo','couple','friends']},
@@ -747,6 +761,7 @@ const DESTS = [
   {
     id:'thailand', name:'タイ・バンコク&プーケット', nameEn:'Bangkok & Phuket, Thailand',
     emoji:'🛕', bg:'linear-gradient(135deg,#f59e0b,#16a34a)',
+    photo:'https://images.unsplash.com/photo-1552465011-b4e21bf6e3f3?w=800&q=80&fit=crop',
     region:'海外 / 東南アジア', domestic:false,
     minBudget:80000, maxBudget:280000,
     tags:{styles:['beach_resort','historic_town','street_food','adventure_sport'], q2:['beauty','taste','achieve','learn'], q3:['view_memory','food_memory','activity_memory','culture_memory'], companion:['solo','couple','friends','family_kids']},
@@ -773,6 +788,7 @@ const DESTS = [
   {
     id:'bali', name:'バリ島', nameEn:'Bali, Indonesia',
     emoji:'🌺', bg:'linear-gradient(135deg,#10b981,#0ea5e9)',
+    photo:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80&fit=crop',
     region:'海外 / 東南アジア', domestic:false,
     minBudget:100000, maxBudget:400000,
     tags:{styles:['beach_resort','mountain_forest','luxury_hotel','onsen_slow','adventure_sport'], q2:['beauty','connect','achieve'], q3:['view_memory','relax_memory','activity_memory'], companion:['couple','friends','solo']},
@@ -798,6 +814,7 @@ const DESTS = [
   {
     id:'hawaii', name:'ハワイ', nameEn:'Hawaii, USA',
     emoji:'🌈', bg:'linear-gradient(135deg,#f97316,#ec4899)',
+    photo:'https://images.unsplash.com/photo-1505852679233-d9fd70aff56d?w=800&q=80&fit=crop',
     region:'海外 / ハワイ', domestic:false,
     minBudget:200000, maxBudget:700000,
     tags:{styles:['beach_resort','mountain_forest','luxury_hotel','adventure_sport'], q2:['beauty','achieve','connect'], q3:['view_memory','activity_memory','relax_memory'], companion:['couple','family_kids','friends','solo']},
@@ -823,6 +840,7 @@ const DESTS = [
   {
     id:'europe', name:'ヨーロッパ周遊', nameEn:'Europe',
     emoji:'🏰', bg:'linear-gradient(135deg,#7c3aed,#2563eb)',
+    photo:'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80&fit=crop',
     region:'海外 / ヨーロッパ', domestic:false,
     minBudget:280000, maxBudget:800000,
     tags:{styles:['historic_town','city_walk','street_food','mountain_forest'], q2:['learn','beauty','taste'], q3:['culture_memory','view_memory','food_memory'], companion:['solo','couple','friends']},
@@ -848,6 +866,7 @@ const DESTS = [
   {
     id:'maldives', name:'モルディブ', nameEn:'Maldives',
     emoji:'🏝️', bg:'linear-gradient(135deg,#0ea5e9,#10b981)',
+    photo:'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80&fit=crop',
     region:'海外 / インド洋', domestic:false,
     minBudget:400000, maxBudget:9999999,
     tags:{styles:['beach_resort','luxury_hotel','onsen_slow','adventure_sport'], q2:['beauty','connect','achieve'], q3:['view_memory','relax_memory','activity_memory'], companion:['couple','friends']},
@@ -873,6 +892,7 @@ const DESTS = [
   {
     id:'amami', name:'奄美大島', nameEn:'Amami Oshima, Japan',
     emoji:'🦎', bg:'linear-gradient(135deg,#10b981,#0ea5e9)',
+    photo:'https://images.unsplash.com/photo-1559128010-7c1ad6e1d6a3?w=800&q=80&fit=crop',
     region:'国内 / 鹿児島県', domestic:true,
     minBudget:40000, maxBudget:130000,
     tags:{styles:['beach_resort','mountain_forest','adventure_sport'], q2:['beauty','achieve','learn'], q3:['view_memory','activity_memory','culture_memory'], companion:['solo','couple','friends']},
@@ -897,6 +917,7 @@ const DESTS = [
   {
     id:'guam', name:'グアム', nameEn:'Guam, USA',
     emoji:'🌴', bg:'linear-gradient(135deg,#0ea5e9,#7c3aed)',
+    photo:'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&q=80&fit=crop',
     region:'海外 / 太平洋', domestic:false,
     minBudget:100000, maxBudget:350000,
     tags:{styles:['beach_resort','luxury_hotel','city_walk'], q2:['connect','beauty','relax'], q3:['relax_memory','view_memory'], companion:['family_kids','couple','friends']},
@@ -922,6 +943,7 @@ const DESTS = [
   {
     id:'picnic_walk', name:'近所の散歩ピクニック旅', nameEn:'Local Walk & Picnic',
     emoji:'🧺', bg:'linear-gradient(135deg,#10b981,#84cc16)',
+    photo:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80&fit=crop',
     region:'家の近所 / どこでも', domestic:true,
     minBudget:0, maxBudget:1000,
     tags:{styles:['mountain_forest','onsen_slow'], q2:['beauty','connect','taste'], q3:['relax_memory','food_memory','view_memory'], companion:['solo','couple','family_kids','family_adult','friends']},
@@ -947,6 +969,7 @@ const DESTS = [
   {
     id:'cycling_trip', name:'自転車サイクリング旅', nameEn:'Cycling Day Trip',
     emoji:'🚴', bg:'linear-gradient(135deg,#84cc16,#0ea5e9)',
+    photo:'https://images.unsplash.com/photo-1541625602602-3ab5e30d6a08?w=800&q=80&fit=crop',
     region:'自宅周辺〜近郊 / 国内', domestic:true,
     minBudget:0, maxBudget:3000,
     tags:{styles:['mountain_forest','beach_resort','city_walk'], q2:['achieve','beauty','connect'], q3:['activity_memory','view_memory','relax_memory'], companion:['solo','couple','friends']},
@@ -972,6 +995,7 @@ const DESTS = [
   {
     id:'free_explore', name:'無料スポット・街歩き旅', nameEn:'Free City Exploration',
     emoji:'🗺️', bg:'linear-gradient(135deg,#8b5cf6,#10b981)',
+    photo:'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80&fit=crop',
     region:'近隣の街 / 国内', domestic:true,
     minBudget:0, maxBudget:5000,
     tags:{styles:['historic_town','city_walk'], q2:['learn','beauty','taste'], q3:['culture_memory','view_memory','food_memory'], companion:['solo','couple','friends']},
@@ -999,6 +1023,7 @@ const DESTS = [
   {
     id:'private_jet_world', name:'プライベートジェット世界一周', nameEn:'Private Jet World Tour',
     emoji:'✈️', bg:'linear-gradient(135deg,#1a1a2e,#f59e0b)',
+    photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80&fit=crop',
     region:'全世界 / 青天井プラン', domestic:false,
     minBudget:500000000, maxBudget:999999999999,
     tags:{styles:['beach_resort','historic_town','luxury_hotel','street_food','mountain_forest'], q2:['beauty','taste','learn','achieve'], q3:['view_memory','food_memory','culture_memory','activity_memory'], companion:['solo','couple','friends','family_adult']},
@@ -1026,6 +1051,7 @@ const DESTS = [
   {
     id:'luxury_cruise', name:'豪華客船世界一周クルーズ', nameEn:'World Cruise - Luxury Liner',
     emoji:'🚢', bg:'linear-gradient(135deg,#1e3a5f,#0ea5e9)',
+    photo:'https://images.unsplash.com/photo-1548574505-5e239809f93f?w=800&q=80&fit=crop',
     region:'全世界の海 / 青天井プラン', domestic:false,
     minBudget:10000000, maxBudget:999999999999,
     tags:{styles:['beach_resort','luxury_hotel','historic_town','street_food'], q2:['beauty','connect','taste','learn'], q3:['view_memory','relax_memory','culture_memory','food_memory'], companion:['couple','family_adult','friends','solo']},
@@ -1052,6 +1078,7 @@ const DESTS = [
   {
     id:'island_buyout', name:'プライベートアイランド貸切＆遊園地貸切', nameEn:'Private Island & Theme Park Buyout',
     emoji:'🏝️', bg:'linear-gradient(135deg,#f59e0b,#ef4444)',
+    photo:'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80&fit=crop',
     region:'世界中 / 青天井プラン', domestic:false,
     minBudget:100000000, maxBudget:999999999999,
     tags:{styles:['beach_resort','luxury_hotel','adventure_sport','onsen_slow'], q2:['achieve','beauty','connect'], q3:['activity_memory','view_memory','relax_memory'], companion:['couple','friends','family_kids','family_adult']},
@@ -1300,12 +1327,18 @@ function showResults() {
   const budget = BDGDATA[S.budgetIdx];
   const companionLabel = { solo:'一人旅', couple:'パートナーとの旅', family_kids:'家族旅行', family_adult:'家族旅行', friends:'友人との旅' };
 
+  const personaBg = persona.bg || 'linear-gradient(135deg,#6366f1,#a855f7)';
+  document.getElementById('personaBanner').style.background = personaBg;
   document.getElementById('personaBanner').innerHTML = `
-    <div class="persona-emoji">${persona.emoji}</div>
-    <div>
-      <div class="persona-type">あなたの旅タイプ</div>
+    <div class="persona-bg-deco">${persona.emoji}</div>
+    <div class="persona-content">
+      <div class="persona-type-badge">✨ あなたの旅タイプ診断結果</div>
+      <div class="persona-main-emoji">${persona.emoji}</div>
       <div class="persona-name">${persona.name}</div>
       <div class="persona-desc">${persona.desc}</div>
+      <button class="share-btn" onclick="sharePersona('${persona.name}','${persona.emoji}')">
+        📤 この結果をシェアする
+      </button>
     </div>
   `;
   const durMap = {'2days':'1泊2日','3days':'2泊3日','5days':'4〜5日','week':'1週間','long':'2週間+'};
@@ -1330,7 +1363,9 @@ function renderDests(dests) {
   grid.innerHTML = dests.map((d, i) => `
     <div class="dest-card ${i < 3 ? 'top-pick' : ''}" onclick="openModal('${d.id}')">
       <div class="dest-img" style="background:${d.bg}">
-        ${d.emoji}
+        ${d.photo ? `<img class="dest-photo" src="${d.photo}" alt="${d.name}" loading="lazy" onerror="this.style.display='none'">` : ''}
+        <div class="dest-photo-overlay"></div>
+        <div class="dest-emoji-badge">${d.emoji}</div>
         ${i < 3 ? `<div class="dest-rank">${['🥇 1位','🥈 2位','🥉 3位'][i]}</div>` : ''}
         <div class="dest-badge ${d.domestic ? 'badge-cheap' : d.minBudget >= 300000 ? 'badge-luxury' : 'badge-match'}">${d.domestic ? '国内' : '海外'}</div>
       </div>
@@ -1396,6 +1431,23 @@ function openModal(id) {
 
 function closeOverlay(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+
+function sharePersona(name, emoji) {
+  const url = 'https://horirick06080601-blip.github.io/travel-planner/';
+  const text = `私の旅タイプは「${emoji} ${name}」でした！
+あなたはどんな旅タイプ？無料で診断できます👇
+${url}`;
+  if (navigator.share) {
+    navigator.share({ text, url }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('📋 コピーしました！
+SNSに貼り付けてシェアしてください✨');
+    }).catch(() => {
+      prompt('以下をコピーしてシェアしてください：', text);
+    });
+  }
+}
 
 function resetAll() {
   Object.assign(S, { homeCountry:'', companion:'', q1:new Set(), q2:new Set(), q3:new Set(), q4:new Set(), q5:new Set(), visions:new Set(), budgetIdx:4, duration:'', area:'' });
