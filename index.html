@@ -1053,8 +1053,12 @@ function scoreDestination(d) {
   // Duration
   if (d.duration && d.duration.includes(S.duration)) score += 8;
 
-  // Area
-  if (d.area && (d.area.includes(S.area) || S.area === 'any' || d.area.includes('any'))) score += 8;
+  // Area — 国内選択時は domestic フラグで厳密判定
+  if (S.area === 'domestic') {
+    if (d.domestic) score += 8;
+  } else {
+    if (d.area && (d.area.includes(S.area) || S.area === 'any' || d.area.includes('any'))) score += 8;
+  }
 
   return score;
 }
@@ -1073,6 +1077,12 @@ let allScored = [];
 function showResults() {
   allScored = DESTS.map(d => ({ ...d, score: scoreDestination(d) }))
     .filter(d => d.score >= 0)
+    .filter(d => {
+      // エリア選択によるハードフィルター
+      if (S.area === 'domestic') return d.domestic === true;
+      if (S.area === 'asia' || S.area === 'hawaii' || S.area === 'europe') return d.domestic === false;
+      return true; // 'any' は全て表示
+    })
     .sort((a, b) => b.score - a.score);
 
   const persona = buildPersona();
