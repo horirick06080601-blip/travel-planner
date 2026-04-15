@@ -481,33 +481,144 @@ const BUDGETS = [
 
 // ======== PERSONAS ========
 function buildPersona() {
-  // Use primary (first) selected value from each set for persona
-  const q1=S.q1.values().next().value, q2=S.q2.values().next().value, q3=S.q3.values().next().value, comp=S.companion;
+  const q1=[...S.q1], q2=[...S.q2], q3=[...S.q3], q4=[...S.q4], q5=[...S.q5];
+  const comp = S.companion;
+  const has = (arr, v) => arr.includes(v);
 
-  // Type mapping
-  const combos = {
-    'beauty+view_memory': { emoji:'🌄', name:'絶景ハンター', desc:'美しい景色に心を動かされる人。写真や記憶に残る「見たことがない景色」を求めて旅する。' },
-    'taste+food_memory': { emoji:'🍜', name:'グルメ旅人', desc:'旅の目的は「食」。現地でしか食べられないものに出会うことが、最大の幸せ。' },
-    'achieve+activity_memory': { emoji:'🏄', name:'アドベンチャー派', desc:'日常では味わえないスリルと達成感を求める。体を動かし、限界を超えることが喜び。' },
-    'connect+relax_memory': { emoji:'😌', name:'癒し・ゆったり派', desc:'大切な人とゆっくり過ごすこと、非日常の空間でリフレッシュすることが旅の目的。' },
-    'learn+culture_memory': { emoji:'🏛️', name:'文化・知的探求者', desc:'知らない歴史や文化に触れて視野を広げること。旅は自分を豊かにする学びの場。' },
-  };
+  const PERSONAS = [
+    {
+      emoji:'🌄', name:'絶景ハンター',
+      desc:'息をのむような景色を求めて旅する人。「この景色を見るために生きている」と思える瞬間が人生の宝物。カメラを片手に、まだ誰も知らない絶景を探し続けます。',
+      score:()=> (has(q2,'beauty')?3:0)+(has(q3,'view_memory')?3:0)+(has(q4,'active_travel')?2:0)+(has(q1,'outdoor')?1:0)
+    },
+    {
+      emoji:'📸', name:'フォトグラファー旅人',
+      desc:'旅先の光、色、瞬間を写真に収めることが最大の喜び。同じ場所でも、季節や時間を変えて何度でも訪れる。シャッターを切る瞬間が旅のクライマックス。',
+      score:()=> (has(q2,'beauty')?3:0)+(has(q3,'view_memory')?3:0)+(has(q4,'slow_travel')?2:0)+(has(q1,'explore')?1:0)
+    },
+    {
+      emoji:'🍜', name:'本場グルメ探検家',
+      desc:'旅の目的は「食」一択。現地の市場・屋台・名店を食べ歩き、食の記憶を積み重ねていく旅人。「あの味をもう一度」のために、また旅に出る。',
+      score:()=> (has(q2,'taste')?4:0)+(has(q3,'food_memory')?3:0)+(has(q4,'spontaneous_travel')?1:0)+(has(q1,'social')?1:0)
+    },
+    {
+      emoji:'🍣', name:'食文化・美食研究者',
+      desc:'食を通して文化を理解する人。レシピや食材の背景、食文化の歴史にまで興味が及ぶ食の知識人。ミシュランより地元のおばちゃんの店が好き。',
+      score:()=> (has(q2,'taste')?3:0)+(has(q3,'food_memory')?2:0)+(has(q2,'learn')?2:0)+(has(q5,'local_stay')?2:0)
+    },
+    {
+      emoji:'🍷', name:'高級美食・グルメ旅行家',
+      desc:'食の最高峰を知りたい人。ミシュランレストラン・高級ワイン・上質な食体験のために旅する。美食と高級ホテルがセットで完成する旅のスタイル。',
+      score:()=> (has(q2,'taste')?3:0)+(has(q5,'luxury_stay')?3:0)+(has(q3,'food_memory')?2:0)+(has(q4,'slow_travel')?1:0)
+    },
+    {
+      emoji:'🏄', name:'アドベンチャー派',
+      desc:'日常では味わえないスリルと達成感を求める行動派。ダイビング・トレッキング・サーフィン。体を動かし、限界を超えることが旅の喜び。',
+      score:()=> (has(q2,'achieve')?3:0)+(has(q3,'activity_memory')?3:0)+(has(q4,'active_travel')?3:0)+(has(q1,'outdoor')?1:0)
+    },
+    {
+      emoji:'🏔️', name:'山岳・自然チャレンジャー',
+      desc:'大自然の中でこそ本当の自分に出会える人。山・森・川・荒野に飛び込んでいく冒険心の持ち主。テントと星空があれば幸せ。',
+      score:()=> (has(q2,'achieve')?2:0)+(has(q3,'activity_memory')?2:0)+(has(q5,'nature_stay')?3:0)+(has(q1,'outdoor')?2:0)
+    },
+    {
+      emoji:'🤿', name:'海洋冒険者',
+      desc:'海の中の世界に魅了された人。珊瑚礁・熱帯魚・ウミガメ。水面の下に広がる別世界を求めて、青い海のある場所に引き寄せられる。',
+      score:()=> (has(q3,'activity_memory')?2:0)+(has(q5,'nature_stay')?1:0)+(has(q1,'outdoor')?2:0)+(has(q2,'beauty')?2:0)+(has(q2,'achieve')?1:0)
+    },
+    {
+      emoji:'🏛️', name:'文化・歴史探求者',
+      desc:'知らない歴史や文化に触れて視野を広げる知的旅人。博物館・史跡・遺跡が何より楽しい。旅先で買うのはお土産より本。',
+      score:()=> (has(q2,'learn')?3:0)+(has(q3,'culture_memory')?3:0)+(has(q4,'slow_travel')?2:0)+(has(q1,'explore')?1:0)
+    },
+    {
+      emoji:'📚', name:'知的好奇心旅人',
+      desc:'旅は最高の学校。歴史・文化・社会・自然を肌で感じ、知識と視野を広げることが旅の本質。旅から帰ると、少しだけ賢くなっている気がする。',
+      score:()=> (has(q2,'learn')?4:0)+(has(q3,'culture_memory')?2:0)+(has(q4,'balanced_travel')?1:0)+(has(q1,'explore')?1:0)
+    },
+    {
+      emoji:'🎨', name:'アート・デザイン巡り派',
+      desc:'美しいもの・カッコいいもの・おしゃれなものを求めて旅する人。美術館・建築・デザインホテル・ギャラリーが旅のメインイベント。',
+      score:()=> (has(q2,'beauty')?2:0)+(has(q2,'learn')?2:0)+(has(q5,'design_stay')?3:0)+(has(q3,'culture_memory')?1:0)
+    },
+    {
+      emoji:'🎭', name:'ローカル没入旅人',
+      desc:'観光地より、地元の人が暮らす場所に惹かれる人。住むように旅し、その街のリズムに溶け込むことで、本物の文化を体験したい。',
+      score:()=> (has(q5,'local_stay')?3:0)+(has(q4,'slow_travel')?2:0)+(has(q2,'learn')?1:0)+(has(q2,'connect')?1:0)+(has(q3,'culture_memory')?1:0)
+    },
+    {
+      emoji:'♨️', name:'温泉・和文化癒し派',
+      desc:'旅に行くなら温泉旅館。畳の上でごろごろ、露天風呂から星を眺め、会席料理をゆっくり味わう。日本の旅文化の粋を堪能する人。',
+      score:()=> (has(q5,'onsen_stay')?4:0)+(has(q4,'slow_travel')?2:0)+(has(q3,'relax_memory')?2:0)+(has(q1,'relax')?1:0)
+    },
+    {
+      emoji:'💎', name:'ラグジュアリーリゾート派',
+      desc:'旅に行くなら妥協しない主義。最高のホテル・料理・サービスで、完璧な非日常を楽しむ贅沢派。上質な空間と時間こそが最高のリフレッシュ。',
+      score:()=> (has(q5,'luxury_stay')?4:0)+(has(q3,'relax_memory')?2:0)+(has(q4,'slow_travel')?1:0)+(has(q2,'connect')?1:0)
+    },
+    {
+      emoji:'🌿', name:'デジタルデトックス旅人',
+      desc:'スマホを置いて、自然の中でリセットしたい人。森の香り・川のせせらぎ・満天の星。自然に包まれると、本来の自分に戻れる気がする。',
+      score:()=> (has(q5,'nature_stay')?3:0)+(has(q3,'relax_memory')?2:0)+(has(q4,'slow_travel')?2:0)+(has(q1,'outdoor')?2:0)
+    },
+    {
+      emoji:'🧘', name:'ウェルネス・スパ旅人',
+      desc:'心と体を整えることが旅の目的。ヨガ・瞑想・スパ・自然の中での深呼吸。日常のストレスをゼロにリセットする「整える旅」が好き。',
+      score:()=> (has(q3,'relax_memory')?3:0)+(has(q4,'slow_travel')?2:0)+(has(q5,'luxury_stay')||has(q5,'onsen_stay')||has(q5,'nature_stay')?2:0)+(has(q2,'connect')?1:0)
+    },
+    {
+      emoji:'🌸', name:'日本の美・和文化探求者',
+      desc:'日本の四季・伝統文化・侘び寂びの美学に惹かれる人。神社仏閣、温泉地、里山、古民家。日本の奥深さを旅で掘り下げたい。',
+      score:()=> (S.area==='domestic'?2:0)+(has(q5,'onsen_stay')?2:0)+(has(q2,'beauty')||has(q2,'learn')?2:0)+(has(q3,'culture_memory')||has(q3,'view_memory')?1:0)+(has(q1,'relax')||has(q1,'explore')?1:0)
+    },
+    {
+      emoji:'💑', name:'ロマンチック二人旅',
+      desc:'大切なパートナーと、特別な時間と思い出を作りたい人。二人だけの空間・夕日・キャンドルディナー。旅で二人の絆がさらに深まる。',
+      score:()=> (comp==='couple'?4:0)+(has(q2,'connect')?2:0)+(has(q3,'relax_memory')?1:0)+((has(q5,'luxury_stay')||has(q5,'onsen_stay'))?2:0)
+    },
+    {
+      emoji:'👨‍👩‍👧', name:'ファミリー旅人',
+      desc:'家族みんなが笑顔になれる旅が最高。子どもの「すごい！」という顔が旅の一番の報酬。家族の共通の思い出が、一番の宝物だと知っている。',
+      score:()=> (comp==='family_kids'?5:0)+(comp==='family_adult'?3:0)+(has(q2,'connect')?2:0)
+    },
+    {
+      emoji:'🎉', name:'友人グループ旅の企画者',
+      desc:'みんなで計画して、みんなで盛り上がる旅が最高。幹事をやるのが好きで、全員が楽しめるプランを考えるのが得意な頼れる存在。',
+      score:()=> (comp==='friends'?4:0)+(has(q1,'social')?2:0)+(has(q2,'connect')?1:0)+((has(q4,'active_travel')||has(q4,'balanced_travel'))?1:0)
+    },
+    {
+      emoji:'🗺️', name:'バックパッカー気質',
+      desc:'計画より自由を愛する旅人。安宿に泊まり・現地の人と交流し・予期せぬ出会いを楽しむ。旅の醍醐味は「想定外」にある、と知っている。',
+      score:()=> (has(q4,'spontaneous_travel')?3:0)+(has(q5,'local_stay')?3:0)+(has(q1,'explore')?2:0)+(has(q2,'connect')||has(q2,'learn')?1:0)
+    },
+    {
+      emoji:'🌐', name:'世界を歩く探検家',
+      desc:'地球の広さを体で感じたい人。見知らぬ国の文化・言語・人に飛び込んでいく好奇心の塊。「まだ行ったことのない国」リストが旅のモチベーション。',
+      score:()=> (has(q1,'explore')?2:0)+(has(q2,'learn')?2:0)+(has(q4,'spontaneous_travel')?2:0)+(S.area==='any'?2:0)
+    },
+    {
+      emoji:'⚡', name:'アクティブ計画派',
+      desc:'旅は攻略するもの。効率よく観光スポットを回り、体験を最大化する行動派。旅のしおりを作り込む段階から旅が始まっている。',
+      score:()=> (has(q4,'active_travel')?3:0)+(has(q2,'achieve')?2:0)+(has(q3,'activity_memory')?2:0)+(has(q1,'outdoor')||has(q1,'explore')?1:0)
+    },
+    {
+      emoji:'😌', name:'のんびり自由人',
+      desc:'ゆっくり流れる時間の中で、自分を取り戻す旅が好き。カフェでぼーっとしたり、あてもなく歩いたり。目的のなさが、最高の贅沢。',
+      score:()=> (has(q4,'slow_travel')?2:0)+(has(q4,'spontaneous_travel')?2:0)+(has(q3,'relax_memory')?2:0)+(has(q1,'relax')?2:0)
+    },
+    {
+      emoji:'✈️', name:'自由な旅人',
+      desc:'旅のスタイルは固定しない。その時の気分・一緒に行く人・目的によって旅を変えられる柔軟な旅人。どんな旅でも楽しめるのが強み。',
+      score:()=> 0
+    },
+  ];
 
-  for (const [key, val] of Object.entries(combos)) {
-    const [k1, k2] = key.split('+');
-    if (q2 === k1 && q3 === k2) return val;
+  let best = PERSONAS[PERSONAS.length - 1], bestScore = -1;
+  for (const p of PERSONAS) {
+    const s = p.score();
+    if (s > bestScore) { bestScore = s; best = p; }
   }
-
-  // Fallback
-  const q2map = {
-    beauty: { emoji:'🌅', name:'美景探求者', desc:'美しいものに感動できる感受性の高い旅人。景色と写真が旅の記憶を彩ります。' },
-    taste:  { emoji:'🍽️', name:'グルメ旅人', desc:'食べることへの情熱が旅を動かす。食の記憶は永遠に残ります。' },
-    achieve:{ emoji:'🏆', name:'アクティブ派', desc:'じっとしていられない行動派。旅でも挑戦と達成感を求めます。' },
-    connect:{ emoji:'💛', name:'絆を大切にする人', desc:'一緒にいる人との時間こそが旅の宝もの。場所よりも、誰と過ごすかを重視します。' },
-    learn:  { emoji:'📚', name:'知的好奇心旺盛', desc:'未知への好奇心が旅を豊かにします。歴史・文化・人との出会いから学ぶことが好き。' },
-  };
-
-  return q2map[q2] || { emoji:'✈️', name:'自由な旅人', desc:'自分だけのスタイルで旅を楽しむ人。条件から最高のプランを提案します。' };
+  return best;
 }
 
 // ======== DESTINATIONS ========
