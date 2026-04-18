@@ -54,10 +54,11 @@
   .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(0,0,0,0.22); }
 
   /* WIZARD */
-  .wizard { max-width: 760px; margin: -50px auto 80px; padding: 0 16px; }
+  .wizard { max-width: 760px; margin: -50px auto 80px; padding: 20px 16px 0; }
 
   /* Progress */
-  .progress-wrap { display: flex; align-items: center; justify-content: center; margin-bottom: 36px; gap: 0; overflow-x: auto; padding: 4px 12px 8px; -webkit-overflow-scrolling: touch; }
+  .progress-wrap { display: flex; align-items: center; justify-content: center; margin-bottom: 36px; gap: 0; padding: 4px 4px 4px; }
+  .progress-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 12px 8px 4px; }
   .prog-step { display: flex; flex-direction: column; align-items: center; }
   .prog-dot {
     width: 44px; height: 44px; border-radius: 50%; background: #fff;
@@ -239,9 +240,9 @@
     .dest-grid { grid-template-columns: 1fr; }
     .persona-banner { flex-direction: column; text-align: center; }
     .modal-body { padding: 22px 20px; }
-    .prog-dot { width: 36px; height: 36px; font-size: 15px; }
+    .prog-dot { width: 36px; height: 36px; font-size: 14px; }
     .prog-label { font-size: 10px; }
-    .prog-line { max-width: 28px; }
+    .prog-line { max-width: 24px; min-width: 12px; }
   }
 </style>
 </head>
@@ -264,14 +265,16 @@
     <div style="font-size:12px;color:var(--muted);font-weight:600;">診断中...</div>
     <button class="restart-mini-btn" onclick="resetAll()">↺ 最初から始める</button>
   </div>
-  <div class="progress-wrap" id="progressWrap">
-    <div class="prog-step active" id="ps1"><div class="prog-dot" data-icon="👥"><span class="prog-num">1</span></div><div class="prog-label">あなたは？</div></div>
-    <div class="prog-line" id="pl1"></div>
-    <div class="prog-step" id="ps2"><div class="prog-dot" data-icon="💭"><span class="prog-num">2</span></div><div class="prog-label">好きなこと</div></div>
-    <div class="prog-line" id="pl2"></div>
-    <div class="prog-step" id="ps3"><div class="prog-dot" data-icon="🌟"><span class="prog-num">3</span></div><div class="prog-label">旅のビジョン</div></div>
-    <div class="prog-line" id="pl3"></div>
-    <div class="prog-step" id="ps4"><div class="prog-dot" data-icon="📋"><span class="prog-num">4</span></div><div class="prog-label">条件</div></div>
+  <div class="progress-scroll">
+    <div class="progress-wrap" id="progressWrap">
+      <div class="prog-step active" id="ps1"><div class="prog-dot" data-icon="👥"><span class="prog-num">1</span></div><div class="prog-label">あなたは？</div></div>
+      <div class="prog-line" id="pl1"></div>
+      <div class="prog-step" id="ps2"><div class="prog-dot" data-icon="💭"><span class="prog-num">2</span></div><div class="prog-label">好きなこと</div></div>
+      <div class="prog-line" id="pl2"></div>
+      <div class="prog-step" id="ps3"><div class="prog-dot" data-icon="🌟"><span class="prog-num">3</span></div><div class="prog-label">旅のビジョン</div></div>
+      <div class="prog-line" id="pl3"></div>
+      <div class="prog-step" id="ps4"><div class="prog-dot" data-icon="📋"><span class="prog-num">4</span></div><div class="prog-label">条件</div></div>
+    </div>
   </div>
 
   <!-- STEP 1: Who -->
@@ -1134,6 +1137,10 @@ function goStep(n) {
     else if (i === n) ps.classList.add('active');
     if (i <= 3) document.getElementById('pl' + i).classList.toggle('done', i < n);
   }
+  // 次のステップの先頭へスクロール
+  const wizard = document.getElementById('wizard');
+  const top = wizard.getBoundingClientRect().top + window.pageYOffset - 16;
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
 }
 
 function pickHomeCountry(el, val) {
